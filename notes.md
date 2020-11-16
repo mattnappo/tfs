@@ -1,6 +1,10 @@
 # Some random notes
 
 # Todo:
- * memory malloc
- * write `free()` methods
+ * Write all destructors and valgrind valgrind valgrind
+ * Connect the ftable to the memory
  * Serialization
+ * Encryption
+ * Add blocks to memory
+ * Network it
+ * Filepaths?

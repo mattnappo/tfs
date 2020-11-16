@@ -78,7 +78,15 @@ unsigned int ftable_add_file(
 }
 
 // Return 1 if the file is in the ftable. Return 0 if not.
-int file_in_ftable(struct ftable *ft, char name[]);
+int file_in_ftable(struct ftable *ft, char name[])
+{
+    struct ftable_bucket *bucket = get_bucket_from_key(ft, name);
+    struct ftable_file *temp = bucket->head;
+    while (temp != NULL)
+        if (strcmp(name, temp->name) == 0)
+            return 1;
+    return 0;
+}
 
 struct ftable_file ftable_get_file(struct ftable *ft, char name[])
 {
