@@ -1,13 +1,15 @@
 SRC  := ./src
 BIN  := ./bin
-EXEC := $(BIN)/memsec.out
+EXEC := $(BIN)/tfs.out
+
+FLAGS := -Wall -g
 
 SOURCES := $(shell find $(SRC) -name '*.c')
 HEADERS := $(shell find $(SRC) -name '*.h')
 
-memsec: $(SOURCES) $(HEADERS)
+tfs: $(SOURCES) $(HEADERS)
 	mkdir -p $(BIN)
-	gcc -o $(EXEC) $(SOURCES)
+	gcc $(FLAGS) -o $(EXEC) $(SOURCES)
 
 clean:
 	rm bin/*

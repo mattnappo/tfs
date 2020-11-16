@@ -17,11 +17,9 @@ struct memory {
   size_t s;
 };
 
-// These are all of the basic operations. Nothing else needs to be
-// implemented for a basic memory.
-
 // Construct a new memory struct
 struct memory *new_memory();
+void destroy_memory(struct memory *mem);
 
 // Print out the contents of a memory
 int dump(struct memory *mem, enum print_mode m);

@@ -8,27 +8,18 @@
 #define MAX_FILES     16
 
 // A struct representing a discrete file independent of
-// any other structure.
+// any other structure. A struct file is the frontend,
+// it just provides users with a bundle of a file, its name,
+// size, and actual data.
 struct file {
     char name[FILENAME_SIZE];
     char *bytes;
     size_t s;
 };
 
-// An entry into a ftable->files.
-struct ftable_entry {
-    char name[FILENAME_SIZE];
-    size_t s;
-    size_t offset;
-};
 
-// An array that holds the metadata of each file.
-struct ftable {
-    struct ftable_entry *files[MAX_FILES];
-    size_t f_count;
-};
-
-// A filesystem. The main struct.
+// A filesystem. Contains the memory itself, and the table
+// of files.
 struct fs {
     struct memory *mem;
     struct ftable *ft;
@@ -37,7 +28,7 @@ struct fs {
 // Make a new fs
 struct fs *new_fs();
 
-// Add a new file to an fs
+// Add a file to an fs
 int add_file(struct fs *fs, struct file *f, size_t offset);
 
 // Print the contents of a file.
@@ -52,14 +43,8 @@ struct file *get_file(struct fs *fs, size_t findex);
 // Construct a file given a filename
 struct file *new_file(const char *name);
 
-// Construct a new ftable
-struct ftable *new_ftable();
-
-// Add a file entry into the ftable
-int add_ftable_entry(struct ftable *ft, struct ftable_entry *entry);
-
-// Print the files in a ftable
-int print_ftable(struct ftable *ft);
+void destroy_file(struct file *f);
+void destroy_fs(struct fs *fs);
 
 #endif
 

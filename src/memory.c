@@ -1,5 +1,9 @@
 #include "memory.h"
 
+// TODO: Add blocks. Memory will then contain an array (pointer)
+// to block structs. A struct block will hold chunks of memory
+// of a certain block size (4K?).
+
 struct memory *new_memory()
 {
   struct memory *mem = malloc(sizeof(struct memory));
@@ -8,6 +12,12 @@ struct memory *new_memory()
 
   return mem;
 }
+
+void destroy_memory(struct memory *mem)
+{
+    free(mem->bytes);
+}
+
 int dump(struct memory *mem, enum print_mode m)
 {
   printf("\n=== BEGIN DUMP ===\n");

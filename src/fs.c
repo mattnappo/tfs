@@ -33,6 +33,12 @@ struct file *new_file(const char *name)
     return f;
 }
 
+void destroy_file(struct file *f)
+{
+    free(f->bytes);
+    free(f);
+}
+
 void print_file(struct file f)
 {
     printf("file:\n  name: %s\n size: %ld\n  bytes: ",
@@ -55,6 +61,12 @@ struct fs *new_fs() // TODO: size parameter
     fs->ft = new_ftable();
 
     return fs;
+}
+
+void destroy_fs(struct fs *fs)
+{
+    destroy_memory(fs->mem);
+    destroy_ftable(fs->ft);
 }
 
 int add_file(struct fs *fs, struct file *f, size_t offset)

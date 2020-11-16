@@ -3,3 +3,4 @@
 # Todo:
  * memory malloc
  * write `free()` methods
+ * Serialization
