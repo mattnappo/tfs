@@ -70,7 +70,7 @@ int ftable_add_file(
     size_t s, size_t offset
 ) {
     if (file_in_ftable(ft, name) == 1) {
-        printf("'%s' already in the ftable.", name);
+        printf("'%s' already in the ftable.\n", name);
         return -1;
     }
     struct ftable_file *f = new_ftable_file(name, s, offset);    
@@ -98,9 +98,11 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
 {
     struct ftable_bucket *bucket = get_bucket_from_key(ft, name);
     struct ftable_file *temp = bucket->head;
-    while (temp != NULL)
+    while (temp != NULL) {
         if (strcmp(name, temp->name) == 0)
             return *temp;
+        temp = temp->next;
+    }
     printf("'%s' not in ftable.\n", name);
     return (struct ftable_file){};
 }

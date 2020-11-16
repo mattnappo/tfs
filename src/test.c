@@ -34,14 +34,19 @@ void test_fs_simple()
     add_file(tfs, tfile2, 0);
     add_file(tfs, tfile1, 100);
     add_file(tfs, tfile3, 200);
+    add_file(tfs, tfile3, 600);
 
     dump(tfs->mem, HEX);
+
+    struct file tfileread1 = get_file(tfs, "testfile.txt");
+    print_file(tfileread1);
 
     destroy_fs(tfs);
 
     destroy_file(tfile1);
     destroy_file(tfile2);
     destroy_file(tfile3);
+    destroy_file(tfileread1);
 }
 
 int test_mem()

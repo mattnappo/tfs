@@ -5,7 +5,7 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#define MEM_SIZE 500
+#define MEM_SIZE 2048
 
 enum print_mode {
     HEX,

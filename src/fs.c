@@ -30,14 +30,11 @@ struct file new_file(const char *name)
     strcpy(f->name, name);
 
     struct file file = *f;
-    free(f); 
+    free(f);
     return file;
 }
 
-void destroy_file(struct file f)
-{
-    free(f.bytes);
-}
+void destroy_file(struct file f) { free(f.bytes); }
 
 void print_file(struct file f)
 {
@@ -51,7 +48,7 @@ void print_file(struct file f)
     printf("\n");
 }
 
-struct fs *new_fs() // TODO: size parameter
+struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
     fs->mem = new_memory();
@@ -69,9 +66,9 @@ void destroy_fs(struct fs *fs)
 
 void add_file(struct fs *fs, struct file f, size_t offset)
 {
-    int status = ftable_add_file(fs->ft, f.name, f.s, offset); // bug here
+    int status = ftable_add_file(fs->ft, f.name, f.s, offset);
     if (status == -1)
-        printf("'%s' is already in the fs\n", f.name);
+        printf("'%s' is already in the fs.\n", f.name);
     else
         write(fs->mem, f.bytes, f.s, offset);
 }
@@ -81,10 +78,15 @@ int remove_file();
 struct file get_file(struct fs *fs, char name[])
 {
     struct ftable_file ftfile = ftable_get_file(fs->ft, name);
+    if (ftfile == NULL) {
+        printf("'%s' not in fs.", name);
+        return (struct file) {};
+    }
     char *memory = read(fs->mem, ftfile.s, ftfile.offset);
+
     struct file f;
-    strcpy(f.name, name);
-    f.bytes = malloc(sizeof(char) * strlen(memory));
+    strcpy(f.name, ftable->);
+    f.bytes = malloc(strlen(memory));
     strcpy(f.bytes, memory);
     f.s = ftfile.s;
     return f;

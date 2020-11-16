@@ -2,7 +2,6 @@
 
 # Todo:
  * Check for filename length safety
- * Write all destructors and check for memleaks
  * Write the algorithm to find free memory
 
 # Other features:
