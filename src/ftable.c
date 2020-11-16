@@ -33,11 +33,17 @@ struct ftable_bucket *new_ftable_bucket()
 struct ftable *new_ftable()
 {
     struct ftable *ft = malloc(sizeof(struct ftable));
-    ft->f_count = 0;
+    ft->n_files = 0;
     for (int i = 0; i < NUM_BUCKETS; i++) {
         ft->buckets[i] = new_ftable_bucket();
     }
     return ft;
+}
+
+static struct ftable_bucket *get_bucket_from_key(
+    struct ftable *ft, char key[]
+) {
+    return ft->buckets[fthash(key) % NUM_BUCKETS];
 }
 
 static void add_file_to_bucket(
@@ -51,26 +57,37 @@ static void add_file_to_bucket(
     }
 
     struct ftable_file *temp = bucket->head;
-    while (temp->next != NULL) {
-        printf("I AM RUNNING \n");
+    while (temp->next != NULL)
         temp = temp->next;
-    }
     temp->next = file;
     temp->prev = temp;
     bucket->tail = file;
     bucket->n_entries++;
 }
 
-unsigned long ftable_add_file(
+unsigned int ftable_add_file(
     struct ftable *ft, char name[],
     size_t s, size_t offset
 ) {
-    struct ftable_file *f = new_ftable_file(name, s, offset);
-    unsigned long key = fthash(name);
-
-    struct ftable_bucket *target_bucket = ft->buckets[key % NUM_BUCKETS];
+    struct ftable_file *f = new_ftable_file(name, s, offset);    
+    unsigned int key = fthash(name) % NUM_BUCKETS;
+    struct ftable_bucket *target_bucket = ft->buckets[key];
     add_file_to_bucket(f, target_bucket);
-
+    ft->n_files++;
     return key;
+}
+
+// Return 1 if the file is in the ftable. Return 0 if not.
+int file_in_ftable(struct ftable *ft, char name[]);
+
+struct ftable_file ftable_get_file(struct ftable *ft, char name[])
+{
+    struct ftable_bucket *bucket = get_bucket_from_key(ft, name);
+    struct ftable_file *temp = bucket->head;
+    while (temp != NULL)
+        if (strcmp(name, temp->name) == 0)
+            return *temp;
+    printf("'%s' not in ftable.\n", name);
+    return (struct ftable_file){};
 }
 

@@ -34,17 +34,19 @@ struct ftable_bucket {
 // ftable_entry is. struct file is not involved in this at all.
 struct ftable {
     struct ftable_bucket *buckets[NUM_BUCKETS];
-    size_t f_count;
+    size_t n_files;
 };
 
 struct ftable *new_ftable();
 struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset);
 
 // Add a file to the ftable
-unsigned long ftable_add_file(
+unsigned int ftable_add_file(
     struct ftable *ft, char name[],
     size_t s, size_t offset
 );
+
+struct ftable_file ftable_get_file(struct ftable *ft, char name[]);
 
 int print_ftable(struct ftable *ft);
 void destroy_ftable(struct ftable *ftable);
