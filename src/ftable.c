@@ -1,6 +1,7 @@
 #include "ftable.h"
+#include <math.h>
 
-// Knuth's number
+// Knuth's number, as I like to call it
 #define A ((sqrt(5) - 1) / 2)
 
 // Hash function for a key k.
@@ -49,11 +50,6 @@ static struct ftable_bucket *get_bucket_from_key(
 static void add_file_to_bucket(
     struct ftable_file *file, struct ftable_bucket *bucket
 ) {
-    if (file_in_ftable(file->name) == 1) {
-        printf("'%s' already in the ftable.", file->name);
-        return;
-    }
-
     if (bucket->head == NULL) {
         bucket->head = file;
         bucket->n_entries++;
@@ -69,12 +65,18 @@ static void add_file_to_bucket(
     bucket->n_entries++;
 }
 
-unsigned int ftable_add_file(
+int ftable_add_file(
     struct ftable *ft, char name[],
     size_t s, size_t offset
 ) {
+    printf("THJIS IS BEING ACLALKJWSDQIPUAYDLAKJSH");
+    if (file_in_ftable(ft, name) == 1) {
+        printf("'%s' already in the ftable.", name);
+        return -1;
+    }
+    printf("made it here!");
     struct ftable_file *f = new_ftable_file(name, s, offset);    
-    unsigned int key = fthash(name) % NUM_BUCKETS;
+    int key = fthash(name) % NUM_BUCKETS;
     struct ftable_bucket *target_bucket = ft->buckets[key];
     add_file_to_bucket(f, target_bucket);
     ft->n_files++;

@@ -1,11 +1,8 @@
-#include <string.h>
-#include "memory.h"
-
 #ifndef FS_H
 #define FS_H
 
-#define FILENAME_SIZE 16
-#define MAX_FILES     16
+#include "memory.h"
+#include "ftable.h"
 
 // A struct representing a discrete file independent of
 // any other structure. A struct file is the frontend,
@@ -28,22 +25,23 @@ struct fs {
 // Make a new fs
 struct fs *new_fs();
 
-// Add a file to an fs
-int add_file(struct fs *fs, struct file *f, size_t offset);
+// Add a file to an fs. TODO:
+// In the future, this will not take an offset. It will find the offset.
+void add_file(struct fs *fs, struct file f, size_t offset);
 
 // Print the contents of a file.
 void print_file(struct file f);
 
 // Remove a file from an fs
-int remove_file(struct fs *fs, struct file *f);
+int remove_file(struct fs *fs, struct file f);
 
 // Get a file from an fs
-struct file *get_file(struct fs *fs, size_t findex);
+struct file get_file(struct fs *fs, char name[]);
 
 // Construct a file given a filename
-struct file *new_file(const char *name);
+struct file new_file(const char *name);
 
-void destroy_file(struct file *f);
+void destroy_file(struct file f);
 void destroy_fs(struct fs *fs);
 
 #endif

@@ -27,7 +27,5 @@ int main(void)
 
     destroy_ftable(ft);
 
-    // also destroy the files? no...
-
     return 0;
 }

@@ -1,10 +1,16 @@
 # Some random notes
 
 # Todo:
- * Write all destructors and valgrind valgrind valgrind
- * Connect the ftable to the memory
+ * Check for filename length safety
+ * Write all destructors and check for memleaks
+ * Write the algorithm to find free memory
+
+# Other features:
  * Serialization
  * Encryption
  * Add blocks to memory
  * Network it
  * Filepaths?
+
+# Small things:
+ * For dumping memory, add a feature to dump to a buffer
