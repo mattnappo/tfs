@@ -104,7 +104,7 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
         temp = temp->next;
     }
     printf("'%s' not in ftable.\n", name);
-    return (struct ftable_file){};
+    return (struct ftable_file) { .s = -1 };
 }
 
 void destroy_ftable(struct ftable *ft)

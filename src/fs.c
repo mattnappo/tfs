@@ -78,14 +78,14 @@ int remove_file();
 struct file get_file(struct fs *fs, char name[])
 {
     struct ftable_file ftfile = ftable_get_file(fs->ft, name);
-    if (ftfile == NULL) {
+    if (ftfile.s == -1) {
         printf("'%s' not in fs.", name);
         return (struct file) {};
     }
     char *memory = read(fs->mem, ftfile.s, ftfile.offset);
 
     struct file f;
-    strcpy(f.name, ftable->);
+    strcpy(f.name, ftfile.name);
     f.bytes = malloc(strlen(memory));
     strcpy(f.bytes, memory);
     f.s = ftfile.s;
