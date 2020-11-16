@@ -25,5 +25,9 @@ int main(void)
     get(ft, "not");
     get(ft, "awesome");
 
+    destroy_ftable(ft);
+
+    // also destroy the files? no...
+
     return 0;
 }

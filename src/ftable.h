@@ -49,7 +49,8 @@ unsigned int ftable_add_file(
 struct ftable_file ftable_get_file(struct ftable *ft, char name[]);
 int file_in_ftable(struct ftable *ft, char name[]);
 
-int print_ftable(struct ftable *ft);
-void destroy_ftable(struct ftable *ftable);
+void destroy_ftable(struct ftable *ft);
+void destroy_ftable_file(struct ftable_file *file);
+void destroy_ftable_bucket(struct ftable_bucket *bucket);
 
 #endif

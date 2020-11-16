@@ -49,7 +49,11 @@ static struct ftable_bucket *get_bucket_from_key(
 static void add_file_to_bucket(
     struct ftable_file *file, struct ftable_bucket *bucket
 ) {
-    // TODO: Check that it is not already in the hashmap
+    if (file_in_ftable(file->name) == 1) {
+        printf("'%s' already in the ftable.", file->name);
+        return;
+    }
+
     if (bucket->head == NULL) {
         bucket->head = file;
         bucket->n_entries++;
@@ -97,5 +101,28 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
             return *temp;
     printf("'%s' not in ftable.\n", name);
     return (struct ftable_file){};
+}
+
+void destroy_ftable(struct ftable *ft)
+{
+    for (int i = 0; i < NUM_BUCKETS; i++)
+        destroy_ftable_bucket(ft->buckets[i]);
+    free(ft);
+}
+
+void destroy_ftable_file(struct ftable_file *file)
+{
+    free(file);
+}
+
+void destroy_ftable_bucket(struct ftable_bucket *bucket)
+{
+    struct ftable_file *temp;
+    while (bucket->head != NULL) {
+        temp = bucket->head;
+        bucket->head = bucket->head->next;
+        destroy_ftable_file(temp);
+    }
+    free(bucket);
 }
 
