@@ -69,12 +69,10 @@ int ftable_add_file(
     struct ftable *ft, char name[],
     size_t s, size_t offset
 ) {
-    printf("THJIS IS BEING ACLALKJWSDQIPUAYDLAKJSH");
     if (file_in_ftable(ft, name) == 1) {
         printf("'%s' already in the ftable.", name);
         return -1;
     }
-    printf("made it here!");
     struct ftable_file *f = new_ftable_file(name, s, offset);    
     int key = fthash(name) % NUM_BUCKETS;
     struct ftable_bucket *target_bucket = ft->buckets[key];
@@ -88,9 +86,11 @@ int file_in_ftable(struct ftable *ft, char name[])
 {
     struct ftable_bucket *bucket = get_bucket_from_key(ft, name);
     struct ftable_file *temp = bucket->head;
-    while (temp != NULL)
+    while (temp != NULL) {
         if (strcmp(name, temp->name) == 0)
             return 1;
+        temp = temp->next;
+    }
     return 0;
 }
 

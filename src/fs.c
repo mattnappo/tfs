@@ -69,7 +69,7 @@ void destroy_fs(struct fs *fs)
 
 void add_file(struct fs *fs, struct file f, size_t offset)
 {
-    int status = ftable_add_file(fs->ft, f.name, f.s, offset);
+    int status = ftable_add_file(fs->ft, f.name, f.s, offset); // bug here
     if (status == -1)
         printf("'%s' is already in the fs\n", f.name);
     else

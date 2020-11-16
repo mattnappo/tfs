@@ -29,10 +29,11 @@ void test_fs_simple()
     struct fs *tfs = new_fs();
     struct file tfile1 = new_file("testfile.txt");
     struct file tfile2 = new_file("testfile2.txt");
-    print_file(tfile2);
+    struct file tfile3 = new_file("Makefile");
 
     add_file(tfs, tfile2, 0);
     add_file(tfs, tfile1, 100);
+    add_file(tfs, tfile3, 200);
 
     dump(tfs->mem, HEX);
 
@@ -40,6 +41,7 @@ void test_fs_simple()
 
     destroy_file(tfile1);
     destroy_file(tfile2);
+    destroy_file(tfile3);
 }
 
 int test_mem()
