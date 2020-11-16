@@ -2,11 +2,13 @@
 #define FTABLE_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #include "util.h"
 
 // A power of 2
 #define NUM_BUCKETS 16
+#define FILENAME_SIZE 16
 
 // An entry in an ftable bucket
 struct ftable_file {
@@ -21,34 +23,29 @@ struct ftable_file {
 // A bucket in the ftable. This map resolves collisions
 // with chaining.
 struct ftable_bucket {
-    struct ftable_file *entries; // Doubly-LL of collisions
+    // Doubly-LL of collisions
+    struct ftable_file *head;
+    struct ftable_file *tail;
     size_t n_entries;
 };
 
-// An ftable_keys (filenames) to ftable_entries (a file).
+// A map between ftable_keys (filenames) to ftable_entries (a file).
 // A file is just a size and an offset, which is what an
 // ftable_entry is. struct file is not involved in this at all.
 struct ftable {
-    struct ftable_bucket *bucekts[NUM_BUCKETS];
+    struct ftable_bucket *buckets[NUM_BUCKETS];
     size_t f_count;
 };
 
-// The key space of an ftable
-struct ftable_key {
-    char name[FILENAME_SIZE]; // The name of the file
-};
-
-// Construct a new ftable
 struct ftable *new_ftable();
+struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset);
 
-// Add a file entry into the ftable
-int add_ftable_entry(
-    struct ftable *ft,
-    struct ftable_key *key,
-    struct ftable_entry *entry
+// Add a file to the ftable
+unsigned long ftable_add_file(
+    struct ftable *ft, char name[],
+    size_t s, size_t offset
 );
 
-// Print the files in a ftable
 int print_ftable(struct ftable *ft);
 void destroy_ftable(struct ftable *ftable);
 
