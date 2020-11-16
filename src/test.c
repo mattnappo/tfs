@@ -31,8 +31,8 @@ void test_fs_simple()
     struct file tfile2 = new_file("testfile2.txt");
     print_file(tfile2);
 
-    add_file(tfs, tfile1, 0);
-    add_file(tfs, tfile2, 30);
+    add_file(tfs, tfile2, 0);
+    add_file(tfs, tfile1, 100);
 
     dump(tfs->mem, HEX);
 

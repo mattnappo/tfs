@@ -21,13 +21,17 @@ struct file new_file(const char *name)
             free(f->bytes);
             f->bytes = NULL;
             f->s = 0;
+            printf("error in reading file.");
+            exit(1);
         }
     
         fclose(fp);
     }
     strcpy(f->name, name);
-  
-    return *f;
+
+    struct file file = *f;
+    free(f); 
+    return file;
 }
 
 void destroy_file(struct file f)
