@@ -27,6 +27,8 @@ struct file new_file(const char *name)
     
         fclose(fp);
     }
+    // memcpy(f->name, name, strlen(name));
+    
     strcpy(f->name, name);
 
     struct file file = *f;
@@ -38,8 +40,7 @@ void destroy_file(struct file f) { free(f.bytes); }
 
 void print_file(struct file f)
 {
-    printf("fs file:\n  name: %s\n  size: %ld\n  bytes: ", f.name, f.s
-    );
+    printf("fs file:\n  name: %s\n  size: %ld\n  bytes: ", f.name, f.s);
 
     // TODO: make a temp memory and use dump here.
     for (int i = 0; i < f.s; i++) {
@@ -79,16 +80,18 @@ struct file get_file(struct fs *fs, char name[])
 {
     struct ftable_file ftfile = ftable_get_file(fs->ft, name);
     if (ftfile.s == -1) {
-        printf("'%s' not in fs.", name);
+        printf("'%s' not in fs.\n", name);
         return (struct file) {};
     }
     char *memory = read(fs->mem, ftfile.s, ftfile.offset);
 
     struct file f;
     strcpy(f.name, ftfile.name);
-    f.bytes = malloc(strlen(memory));
-    strcpy(f.bytes, memory);
+    f.bytes = calloc(ftfile.s, 1);
+    memcpy(f.bytes, memory, ftfile.s);
     f.s = ftfile.s;
+
+    free(memory);
     return f;
 }
 

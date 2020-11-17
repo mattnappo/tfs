@@ -24,6 +24,18 @@ void test_fs()
     // destroy_file(tfile); // ?
 }
 
+void get(struct fs *tfs, char fname[])
+{
+    printf("\n\n");
+    struct file tread = get_file(tfs, fname);
+    print_file(tread);
+    for (int i = 0; i < tread.s; i++)
+        printf("%c", tread.bytes[i]);
+    printf("\n");
+    destroy_file(tread);
+    printf("\n\n");
+}
+
 void test_fs_simple()
 {
     struct fs *tfs = new_fs();
@@ -38,15 +50,16 @@ void test_fs_simple()
 
     dump(tfs->mem, HEX);
 
-    struct file tfileread1 = get_file(tfs, "testfile.txt");
-    print_file(tfileread1);
+    get(tfs, "filename");
+    get(tfs, "testfile.txt");
+    get(tfs, "testfile2.txt");
+    get(tfs, "Makefile");
 
     destroy_fs(tfs);
 
     destroy_file(tfile1);
     destroy_file(tfile2);
     destroy_file(tfile3);
-    destroy_file(tfileread1);
 }
 
 int test_mem()
