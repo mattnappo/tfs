@@ -2,6 +2,7 @@
 
 # Todo:
  * Check for filename length safety
+ * change all chars to uint8\_ts where necessary
  * Write the algorithm to find free memory
 
 # Other features:

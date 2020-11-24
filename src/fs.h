@@ -14,7 +14,6 @@ struct file {
     size_t s;
 };
 
-
 // A filesystem. Contains the memory itself, and the table
 // of files.
 struct fs {
