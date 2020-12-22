@@ -39,8 +39,8 @@ struct memory *deserialize_memory(uint8_t *buf, unsigned len)
 unsigned serialize_ftable_file(uint8_t **buf, struct ftable_file *file)
 {
     FiletableFile ftf = FILETABLE_FILE__INIT;
-    ftf.name = malloc(strlen(file->name));
-    strcpy(ftf.name, file->name); // Can use bc filename is null terminated
+    ftf.name = malloc(strlen(file->name) + 1);
+    strcpy(ftf.name, file->name);
     ftf.s = file->s;
     ftf.offset = file->offset;
 
@@ -76,7 +76,7 @@ unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
         files[i] = malloc(sizeof(FiletableFile));
         filetable_file__init(files[i]);
         struct ftable_file fetched = bucket_get_file_index(bucket, i);
-        files[i]->name = malloc(strlen(fetched.name));
+        files[i]->name = malloc(strlen(fetched.name) + 1);
         strcpy(files[i]->name, fetched.name);
         files[i]->s = fetched.s;
         files[i]->offset = fetched.offset;
@@ -87,15 +87,14 @@ unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
     unsigned len = filetable_bucket__get_packed_size(&ftb);
     *buf = malloc(len);
     filetable_bucket__pack(&ftb, *buf);
-
-    fprintf(stderr, "writing %d serialized bytes\n", len); // Print packed len
+    fprintf(stderr, "writing %d serialized bytes\n", len);
 
     for (int i = 1; i < bucket->n_entries; i++) {
         free(files[i]->name);
         free(files[i]);
     }
+    free(ftb.files);
     free(files);
-
     return len;
 }
 

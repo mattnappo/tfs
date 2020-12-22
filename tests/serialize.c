@@ -23,8 +23,6 @@ void test_memory()
     for (int u = 0; u < len; u++)
         printf("%0x ", serialized_buf[u]);
 
-    destroy_memory(mem);
-
     // Deserialize into a new mem*
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 
@@ -82,7 +80,7 @@ void test_ftbucket()
                 printf("%x ", buffer[u]);
             printf("\n");
 
-            /* deserialize */
+            // then deserialize
 
             free(buffer);
         }
