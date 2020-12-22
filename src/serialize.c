@@ -87,18 +87,36 @@ unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
     unsigned len = filetable_bucket__get_packed_size(&ftb);
     *buf = malloc(len);
     filetable_bucket__pack(&ftb, *buf);
-    fprintf(stderr, "writing %d serialized bytes\n", len);
+    printf("writing %d serialized bytes\n", len);
 
-    for (int i = 1; i < bucket->n_entries; i++) {
+    for (int i = 0; i < bucket->n_entries; i++) {
         free(files[i]->name);
         free(files[i]);
     }
-    free(ftb.files);
     free(files);
     return len;
 }
 
-unsigned deserialize_ftable_bucket(struct ftable_bucket *bucket, uint8_t *buf);
+struct ftable_bucket *deserialize_ftable_bucket(uint8_t *buf, unsigned len)
+{
+    FiletableBucket *ftb = filetable_bucket__unpack(NULL, len, buf);
+    if (ftb == NULL) {
+        printf("error unpacking bytes.\n");
+        return NULL;
+    }
+
+    struct ftable_bucket *ftable_b = new_ftable_bucket();
+    for (int i = 0; i < ftb->n_files; i++) {
+        struct ftable_file *ftf = new_ftable_file(
+            ftb->files[i]->name,
+            ftb->files[i]->s,
+            ftb->files[i]->offset
+        );
+        add_file_to_bucket(ftf, ftable_b);
+    }
+    filetable_bucket__free_unpacked(ftb, NULL);
+    return ftable_b;
+}
 
 unsigned serialize_ftable(uint8_t *buf, struct ftable *ft);
 unsigned deserialize_ftable(struct ftable *ft, uint8_t *buf);

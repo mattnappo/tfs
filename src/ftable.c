@@ -47,7 +47,7 @@ static struct ftable_bucket *get_bucket_from_key(
     return ft->buckets[fthash(key) % NUM_BUCKETS];
 }
 
-static void add_file_to_bucket(
+void add_file_to_bucket(
     struct ftable_file *file, struct ftable_bucket *bucket
 ) {
     if (bucket->head == NULL) {
@@ -125,6 +125,14 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
     }
     printf("'%s' not in ftable.\n", name);
     return (struct ftable_file) {  };
+}
+
+void print_ftable_file(struct ftable_file f)
+{
+    printf(
+        "ftable file:\n    name: %s\n       s: %lu\n  offset: %lu\n",
+        f.name, f.s, f.offset
+    );
 }
 
 void destroy_ftable(struct ftable *ft)

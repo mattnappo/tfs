@@ -54,25 +54,14 @@ void test_ftbucket()
 {
     // unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
     struct ftable *ft = new_ftable();
-    unsigned long key = ftable_add_file(ft, "fname", 10, 20);
-    printf("key: %lu\n", key);
+    ftable_add_file(ft, "fname", 10, 20);
+    ftable_add_file(ft, "abcdef",  33, 44);
+    ftable_add_file(ft, "fdebga",  55, 66);
+    ftable_add_file(ft, "awesome", 77, 88);
 
-    get(ft, "name");
-    get(ft, "fname");
-
-    unsigned long key1 = ftable_add_file(ft, "abcdef",  33, 44);
-    unsigned long key2 = ftable_add_file(ft, "fdebga",  55, 66);
-    unsigned long key3 = ftable_add_file(ft, "awesome", 77, 88);
-    printf("keys: %zu, %zu, %zu\n", key1, key2, key3);
-
-    get(ft, "abcdef");
-    get(ft, "fdebga");
-    get(ft, "not");
-    get(ft, "awesome");
-
-    printf("testing bucket_get_file_index\n");
     for (int k = 0; k < NUM_BUCKETS; k++) {
         if (ft->buckets[k]->n_entries > 0) {
+            // Serialize
             uint8_t *buffer;
             unsigned blen = serialize_ftable_bucket(&buffer, ft->buckets[k]);
             printf("bucket: \n  ");
@@ -80,8 +69,18 @@ void test_ftbucket()
                 printf("%x ", buffer[u]);
             printf("\n");
 
-            // then deserialize
+            // Deserialize
+            struct ftable_bucket *deserialized =
+                deserialize_ftable_bucket(buffer, blen);
 
+            struct ftable_file *temp = deserialized->head;
+            while (temp != NULL) {
+                print_ftable_file(*temp);
+                temp = temp->next;
+            }
+
+            destroy_ftable_file(temp);
+            destroy_ftable_bucket(deserialized);
             free(buffer);
         }
     }
@@ -91,8 +90,8 @@ void test_ftbucket()
 
 int main()
 {
-    // test_memory();
-    // test_ftfile();
+    test_memory();
+    test_ftfile();
     test_ftbucket();
 
     return 0;

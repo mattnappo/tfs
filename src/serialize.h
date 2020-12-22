@@ -16,9 +16,9 @@ unsigned serialize_ftable_bucket (uint8_t **buf, struct ftable_bucket *bucket);
 unsigned serialize_ftable        (uint8_t *buf, struct ftable *ft);
 
 /* deserialize the given buffer and return a pointer to that type */
-struct memory      *deserialize_memory      (uint8_t *buf, unsigned len);
-struct ftable_file *deserialize_ftable_file (uint8_t *buf, unsigned len);
-unsigned deserialize_ftable_bucket (struct ftable_bucket *bucket, uint8_t *buf);
+struct memory        *deserialize_memory        (uint8_t *buf, unsigned len);
+struct ftable_file   *deserialize_ftable_file   (uint8_t *buf, unsigned len);
+struct ftable_bucket *deserialize_ftable_bucket (uint8_t *buf, unsigned len);
 unsigned deserialize_ftable        (struct ftable *ft,            uint8_t *buf);
 
 #endif
