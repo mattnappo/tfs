@@ -33,7 +33,7 @@ struct memory *deserialize_memory(void *buf, unsigned len)
      
     memory__free_unpacked(mem_b, NULL);
     free(buf);
-    return NULL;
+    return mem;
 }
 
 unsigned serialize_ftable_file(uint8_t *buf, struct ftable_file *file);
