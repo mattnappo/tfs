@@ -85,6 +85,10 @@ struct ftable_file bucket_get_file_index(struct ftable_bucket *bucket, int i)
 {
     // TODO: optimize to look backwards if i in second half and forwards if
     // i in first half (start at tail vs start at head)
+    if (i >= bucket->n_entries) {
+        printf("index %d out of bounds in bucket.", i);
+        return (struct ftable_file) {  };
+    }
     int j = 0;
     struct ftable_file *temp = bucket->head;
     while (temp != NULL) {

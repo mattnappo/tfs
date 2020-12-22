@@ -72,55 +72,31 @@ unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
     FiletableFile **files;
 
     files = malloc(sizeof(FiletableBucket *) * bucket->n_entries);
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < bucket->n_entries; i++) {
         files[i] = malloc(sizeof(FiletableFile));
         filetable_file__init(files[i]);
-
-        // Get ith file from bucket
-        // files[i]->name = get_file.name;
-        // etc...
-
-        // files[i]->name = fetched.name;
-        // strcpy(ftf.name, file->name); // Can use bc filename is null terminated
-        // ftf.s = file->s;
-        // ftf.offset = file->offset;
-        // files[i]->
-
-    }    
+        struct ftable_file fetched = bucket_get_file_index(bucket, i);
+        files[i]->name = malloc(strlen(fetched.name));
+        strcpy(files[i]->name, fetched.name);
+        files[i]->s = fetched.s;
+        files[i]->offset = fetched.offset;
+    }
 
     ftb.n_files = bucket->n_entries;
     ftb.files = files;
     unsigned len = filetable_bucket__get_packed_size(&ftb);
-    buf = malloc(len);
-    filetable_bucket__pack(&ftb, buf);
+    *buf = malloc(len);
+    filetable_bucket__pack(&ftb, *buf);
 
-    fprintf(stderr, "writing %d serialized bytes\n", len); // See the length of message
+    fprintf(stderr, "writing %d serialized bytes\n", len); // Print packed len
 
     for (int i = 1; i < bucket->n_entries; i++) {
-        free(subs[i]);
+        free(files[i]->name);
+        free(files[i]);
     }
-    free(subs); 
+    free(files);
 
     return len;
-
-    // FiletableBucket ftb = FILETABLE_BUCKET__INIT;
-
-    // ftb.n_files = bucket->n_entries;
-    // ftb.files = malloc(sizeof(FiletableFile) * ftb.n_files);
-
-    // for (int i = 0; i < ftb.n_files; i++) {
-    //     ftb.files[i] = 
-    // }
-
-    // len = repeated_t__get_packed_size(&rt);
-    // buffer = malloc(len);
-    // repeated_t__pack(&rt, buffer); // Pack rt into buffer
-
-    // fprintf(stderr, "writing %d serialized bytes.\n", len);
-    // fwrite(buffer, len, 1, stdout); // Write the raw bytes to stdout
-
-    // free(rt.rt);
-    // free(buffer);
 }
 
 unsigned deserialize_ftable_bucket(struct ftable_bucket *bucket, uint8_t *buf);
