@@ -71,7 +71,7 @@ unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
     FiletableBucket ftb = FILETABLE_BUCKET__INIT;
     FiletableFile **files;
 
-    files = malloc(sizeof(FiletableBucket *) * bucket->n_entries);
+    files = malloc(sizeof(FiletableFile *) * bucket->n_entries);
     for (int i = 0; i < bucket->n_entries; i++) {
         files[i] = malloc(sizeof(FiletableFile));
         filetable_file__init(files[i]);
@@ -117,7 +117,112 @@ struct ftable_bucket *deserialize_ftable_bucket(uint8_t *buf, unsigned len)
     filetable_bucket__free_unpacked(ftb, NULL);
     return ftable_b;
 }
+unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
+{
+    /*
+        message Filetable { // struct ftable
+            repeated FiletableBucket buckets = 1;
+            uint32 n_files = 2;
+        }
+    */
 
-unsigned serialize_ftable(uint8_t *buf, struct ftable *ft);
-unsigned deserialize_ftable(struct ftable *ft, uint8_t *buf);
+    Filetable sft = FILETABLE__INIT;
+    FiletableBucket **buckets;
+    buckets = malloc(sizeof(FiletableBucket *) * NUM_BUCKETS);
+
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        struct ftable_bucket *bucket = ft->buckets[j]; // This is a temp
+
+        buckets[j] = malloc(sizeof(FiletableBucket));
+        filetable_bucket__init(buckets[j]);
+
+        FiletableFile **files;
+        files = malloc(sizeof(FiletableBucket *) * bucket->n_entries);
+        for (int i = 0; i < bucket->n_entries; i++) {
+            files[i] = malloc(sizeof(FiletableFile));
+            filetable_file__init(files[i]);
+            struct ftable_file fetched = bucket_get_file_index(bucket, i);
+            files[i]->name = malloc(strlen(fetched.name) + 1);
+            strcpy(files[i]->name, fetched.name);
+            files[i]->s = fetched.s;
+            files[i]->offset = fetched.offset;
+        }
+        buckets[j]->n_files = bucket->n_entries;
+        // buckets[j]->files = malloc(sizeof(FiletableFile) * bucket->n_entries);
+        buckets[j]->files = files;
+    }
+    sft.n_buckets = NUM_BUCKETS;
+    // sft.buckets = malloc(sizeof(FiletableBucket) * NUM_BUCKETS);
+    sft.buckets = buckets;
+    sft.n_files = ft->n_files;
+
+    // pack
+    unsigned len = filetable__get_packed_size(&sft);
+    *buf = malloc(len);
+    filetable__pack(&sft, *buf);
+    printf("writing %d serialized bytes\n", len);
+
+    // free
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        printf("running j [%d]\n", j);
+        printf("n entries at bucket j [%d]\n", buckets[j]->n_files);
+        for (int i = 0; i < buckets[j]->n_files; i++) {
+            printf("running i [%d]\n", i);
+            free(buckets[j]->files[i]->name);
+            free(buckets[j]->files[i]);
+        }
+        free(buckets[j]->files);
+        free(buckets[j]);
+    }
+    free(buckets);
+
+    return len;
+}
+
+struct ftable *deserialize_ftable(uint8_t *buf, unsigned len);
+
+unsigned serialize_fs(uint8_t **buf, struct fs *fs)
+{
+/*
+    Filesystem sfs  = FILESYSTEM__INIT;
+    Submessage smem = MEMORY__INIT;
+    Submessage sft  = FILETABLE__INIT;
+
+    smem.mem = ft->mem;
+    smem.bytes_.data = malloc(fs->mem->s);
+    smem.bytes_.len = fs->mem->s;
+    memcpy(smem.bytes_.data, fs->mem->bytes, fs->mem->s);
+
+
+
+
+
+    msg.a = &sub1;               // Point msg.a to sub1 data
+
+
+
+
+    void *buf;
+    unsigned len;
+
+    // NOTE: has_b is not required like amessage, therefore check for NULL on deserialze
+    if (argc == 3) {
+        sub2.value = atoi (argv[2]);
+        msg.b = &sub2; // Point msg.b to sub2 data 
+    }
+
+    len = emessage__get_packed_size (&msg); // This is the calculated packing length
+    buf = malloc (len);                     // Allocate memory
+    emessage__pack (&msg, buf);             // Pack msg, including submessages
+
+    fprintf(stderr,"Writing %d serialized bytes\n",len); // See the length of message
+    fwrite (buf, len, 1, stdout);           // Write to stdout to allow direct command line piping
+
+    free(buf); // Free the allocated serialized buffer
+    return 0;
+    */
+    return 0;
+}
+
+struct fs *deserialize_fs(uint8_t *buf, unsigned len);
 

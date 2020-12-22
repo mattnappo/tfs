@@ -88,11 +88,48 @@ void test_ftbucket()
     destroy_ftable(ft);
 }
 
+void test_ftable()
+{
+    // unsigned serialize_ftable_bucket(uint8_t **buf, struct ftable_bucket *bucket)
+    struct ftable *ft = new_ftable();
+    ftable_add_file(ft, "fname", 10, 20);
+    ftable_add_file(ft, "abcdef",  33, 44);
+    ftable_add_file(ft, "fdebga",  55, 66);
+    ftable_add_file(ft, "awesome", 77, 88);
+
+    // serialize
+    uint8_t *buffer;
+    unsigned slen = serialize_ftable(&buffer, ft);
+
+    // deserialize
+    /*
+    struct ftable *dft = deserialize_ftable(buffer, len);
+
+    // print deserialized
+    for (int k = 0; k < NUM_BUCKETS; k++) {
+        if (dft->buckets[k]->n_entries > 0) {
+            struct ftable_file *temp = dft->head;
+            while (temp != NULL) {
+                print_ftable_file(*temp);
+                temp = temp->next;
+            }
+            destroy_ftable_file(temp);
+        }
+    }
+
+    destroy_ftable(dft);
+    */
+
+    destroy_ftable(ft);
+    free(buffer);
+}
+
 int main()
 {
-    test_memory();
-    test_ftfile();
-    test_ftbucket();
+    // test_memory();
+    // test_ftfile();
+    // test_ftbucket();
+    test_ftable();
 
     return 0;
 }
