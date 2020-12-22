@@ -17,3 +17,9 @@ unsigned long to_radix(char *str)
     return radix;
 }
 
+void err(char *emsg)
+{
+    fprintf(stderr, "%s.\n", emsg);
+    exit(1);
+}
+

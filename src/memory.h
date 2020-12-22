@@ -19,8 +19,9 @@ struct memory {
 
 struct memory *new_memory();
 void destroy_memory(struct memory *mem);
-int dump(struct memory *mem, enum print_mode m);
-int write(struct memory *mem, char *b, size_t s, size_t offset);
-char *read(struct memory *mem, size_t s, size_t offset);
+
+int   dump  (struct memory *mem, enum print_mode m);
+int   write (struct memory *mem, char *b, size_t s, size_t offset);
+char* read  (struct memory *mem, size_t s, size_t offset);
 
 #endif

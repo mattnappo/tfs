@@ -2,8 +2,10 @@
 
 # Todo:
  * Check for filename length safety
- * change all chars to uint8\_ts where necessary
+ * Change all chars to uint8\_ts where necessary
  * Write the algorithm to find free memory
+ * Write a CLI
+ * Better error handling
 
 # Other features:
  * Serialization

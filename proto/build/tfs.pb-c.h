@@ -43,7 +43,7 @@ struct  _File
 struct  _Memory
 {
   ProtobufCMessage base;
-  ProtobufCBinaryData byte_;
+  ProtobufCBinaryData bytes_;
   uint32_t s;
 };
 #define MEMORY__INIT \

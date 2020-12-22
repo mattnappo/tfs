@@ -1,14 +1,17 @@
 syntax = "proto3";
 
+/* frontend types */
+
 message File { // struct file
     string name = 1;
     bytes bytes_ = 2;
     uint32 s = 3;
 }
 
+/* actual types */
+
 message Memory { // struct memory
-    bytes byte_ = 1;
-    uint32 s = 2;
+    bytes bytes_ = 1;
 }
 
 message FiletableFile { // struct ftable_file

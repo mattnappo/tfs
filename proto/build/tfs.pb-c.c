@@ -344,12 +344,12 @@ const ProtobufCMessageDescriptor file__descriptor =
 static const ProtobufCFieldDescriptor memory__field_descriptors[2] =
 {
   {
-    "byte_",
+    "bytes_",
     1,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof(Memory, byte_),
+    offsetof(Memory, bytes_),
     NULL,
     NULL,
     0,             /* flags */
@@ -369,7 +369,7 @@ static const ProtobufCFieldDescriptor memory__field_descriptors[2] =
   },
 };
 static const unsigned memory__field_indices_by_name[] = {
-  0,   /* field[0] = byte_ */
+  0,   /* field[0] = bytes_ */
   1,   /* field[1] = s */
 };
 static const ProtobufCIntRange memory__number_ranges[1 + 1] =
