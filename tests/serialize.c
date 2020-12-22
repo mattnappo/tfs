@@ -102,13 +102,13 @@ void test_ftable()
     unsigned slen = serialize_ftable(&buffer, ft);
 
     // deserialize
-    /*
-    struct ftable *dft = deserialize_ftable(buffer, len);
+    struct ftable *dft = deserialize_ftable(buffer, slen);
 
     // print deserialized
+    printf("deserialized: \n");
     for (int k = 0; k < NUM_BUCKETS; k++) {
         if (dft->buckets[k]->n_entries > 0) {
-            struct ftable_file *temp = dft->head;
+            struct ftable_file *temp = dft->buckets[k]->head;
             while (temp != NULL) {
                 print_ftable_file(*temp);
                 temp = temp->next;
@@ -118,7 +118,6 @@ void test_ftable()
     }
 
     destroy_ftable(dft);
-    */
 
     destroy_ftable(ft);
     free(buffer);

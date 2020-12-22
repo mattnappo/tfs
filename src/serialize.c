@@ -119,13 +119,6 @@ struct ftable_bucket *deserialize_ftable_bucket(uint8_t *buf, unsigned len)
 }
 unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
 {
-    /*
-        message Filetable { // struct ftable
-            repeated FiletableBucket buckets = 1;
-            uint32 n_files = 2;
-        }
-    */
-
     Filetable sft = FILETABLE__INIT;
     FiletableBucket **buckets;
     buckets = malloc(sizeof(FiletableBucket *) * NUM_BUCKETS);
@@ -148,11 +141,9 @@ unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
             files[i]->offset = fetched.offset;
         }
         buckets[j]->n_files = bucket->n_entries;
-        // buckets[j]->files = malloc(sizeof(FiletableFile) * bucket->n_entries);
         buckets[j]->files = files;
     }
     sft.n_buckets = NUM_BUCKETS;
-    // sft.buckets = malloc(sizeof(FiletableBucket) * NUM_BUCKETS);
     sft.buckets = buckets;
     sft.n_files = ft->n_files;
 
@@ -164,8 +155,6 @@ unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
 
     // free
     for (int j = 0; j < NUM_BUCKETS; j++) {
-        printf("running j [%d]\n", j);
-        printf("n entries at bucket j [%d]\n", buckets[j]->n_files);
         for (int i = 0; i < buckets[j]->n_files; i++) {
             printf("running i [%d]\n", i);
             free(buckets[j]->files[i]->name);
@@ -179,7 +168,33 @@ unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
     return len;
 }
 
-struct ftable *deserialize_ftable(uint8_t *buf, unsigned len);
+struct ftable *deserialize_ftable(uint8_t *buf, unsigned len)
+{
+    Filetable *ft = filetable__unpack(NULL, len, buf);
+    if (ft == NULL) {
+        printf("error unpacking bytes.\n");
+        return NULL;
+    }
+
+    struct ftable *dft = new_ftable();
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        struct ftable_bucket *new_bucket = new_ftable_bucket();
+        FiletableBucket ftb = *ft->buckets[j]; // current bucket
+        for (int i = 0; i < ftb.n_files; i++) {
+            struct ftable_file *ftf = new_ftable_file(
+                ftb.files[i]->name,
+                ftb.files[i]->s,
+                ftb.files[i]->offset
+            );
+            add_file_to_bucket(ftf, new_bucket);
+        }
+        free(dft->buckets[j]); // free what was already there
+        dft->buckets[j] = new_bucket;
+    }
+
+    filetable__free_unpacked(ft, NULL);
+    return dft;
+}
 
 unsigned serialize_fs(uint8_t **buf, struct fs *fs)
 {
