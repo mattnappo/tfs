@@ -19,7 +19,7 @@ unsigned serialize_memory(uint8_t **buf, struct memory *mem)
     return len;
 }
 
-struct memory *deserialize_memory(void *buf, unsigned len)
+struct memory *deserialize_memory(uint8_t *buf, unsigned len)
 {
     Memory *mem_b = memory__unpack(NULL, len, buf);
     if (mem_b == NULL) {
@@ -36,8 +36,34 @@ struct memory *deserialize_memory(void *buf, unsigned len)
     return mem;
 }
 
-unsigned serialize_ftable_file(uint8_t *buf, struct ftable_file *file);
-unsigned deserialize_ftable_file(struct ftable_file *file, uint8_t *buf);
+unsigned serialize_ftable_file(uint8_t **buf, struct ftable_file *file)
+{
+    FiletableFile ftf = FILETABLE_FILE__INIT;
+    ftf.name = malloc(strlen(file->name));
+    strcpy(ftf.name, file->name); // Can use bc filename is null terminated
+    ftf.s = file->s;
+    ftf.offset = file->offset;
+
+    unsigned len = filetable_file__get_packed_size(&ftf);
+    *buf = malloc(len);
+    filetable_file__pack(&ftf, *buf);
+    printf("writing %d serialized bytes\n", len);
+    return len;
+}
+
+struct ftable_file *deserialize_ftable_file(uint8_t *buf, unsigned len)
+{
+    FiletableFile *ftf = filetable_file__unpack(NULL, len, buf);
+    if (ftf == NULL) {
+        printf("error unpacking bytes.\n");
+        return NULL;
+    }
+
+    struct ftable_file *ftfile = new_ftable_file(ftf->name, ftf->s, ftf->offset);
+    filetable_file__free_unpacked(ftf, NULL);
+    free(buf);
+    return ftfile;
+}
 
 unsigned serialize_ftable_bucket(uint8_t *buf, struct ftable_bucket *bucket);
 unsigned deserialize_ftable_bucket(struct ftable_bucket *bucket, uint8_t *buf);

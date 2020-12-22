@@ -1,7 +1,8 @@
 #include "serialize.h"
 #include <stdio.h>
+#include <assert.h>
 
-int main()
+void test_memory()
 {
     // Make a memory
     char *s = "test bytes";
@@ -22,6 +23,29 @@ int main()
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 
     dump(d_mem, HEX);
+    free(mem);
+}
+
+void test_ftfile()
+{
+    char *filename = "filename";
+    struct ftable_file *ftf = new_ftable_file(filename, 20, 30);
+    uint8_t *serialized;
+    unsigned len = serialize_ftable_file(&serialized, ftf);
+    for (int u = 0; u < len; u++)
+        printf("%0x ", serialized[u]);
+    printf("\n");
+  
+   struct ftable_file *deserialized = deserialize_ftable_file(serialized, len);
+   printf("deserialized:\n  name: %s\n  size: %ld\noffset: %ld\n",
+       deserialized->name, deserialized->s, deserialized->offset
+   );
+}
+
+int main()
+{
+    // test_memory();
+    test_ftfile();
 
     return 0;
 }
