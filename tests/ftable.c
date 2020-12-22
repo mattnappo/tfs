@@ -25,6 +25,17 @@ int main(void)
     get(ft, "not");
     get(ft, "awesome");
 
+    printf("testing bucket_get_file_index\n");
+    for (int k = 0; k < NUM_BUCKETS; k++) {
+        printf("n files: %ld\n", ft->buckets[k]->n_entries);
+        for (int j = 0; j < ft->buckets[k]->n_entries; j++) {
+            struct ftable_file ftf = bucket_get_file_index(
+                ft->buckets[k], j
+            );
+            printf("name: %s\n  s: %zu\n  offset: %zu\n\n", ftf.name, ftf.s, ftf.offset);
+        }
+    }
+
     destroy_ftable(ft);
 
     return 0;

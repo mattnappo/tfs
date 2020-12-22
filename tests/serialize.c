@@ -23,7 +23,8 @@ void test_memory()
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 
     dump(d_mem, HEX);
-    free(mem);
+    destroy_memory(mem);
+    destroy_memory(d_mem);
 }
 
 void test_ftfile()
@@ -40,6 +41,9 @@ void test_ftfile()
    printf("deserialized:\n  name: %s\n  size: %ld\noffset: %ld\n",
        deserialized->name, deserialized->s, deserialized->offset
    );
+
+   destroy_ftable_file(ftf);
+   destroy_ftable_file(deserialized);
 }
 
 int main()

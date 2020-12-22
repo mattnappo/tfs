@@ -81,6 +81,22 @@ int ftable_add_file(
     return key;
 }
 
+struct ftable_file bucket_get_file_index(struct ftable_bucket *bucket, int i)
+{
+    // TODO: optimize to look backwards if i in second half and forwards if
+    // i in first half (start at tail vs start at head)
+    int j = 0;
+    struct ftable_file *temp = bucket->head;
+    while (temp != NULL) {
+        if (j == i) {
+            return *temp;
+        }
+        temp = temp->next;
+        j++;
+    }
+    return (struct ftable_file) {  };
+}
+
 // Return 1 if the file is in the ftable. Return 0 if not.
 int file_in_ftable(struct ftable *ft, char name[])
 {
@@ -104,7 +120,7 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
         temp = temp->next;
     }
     printf("'%s' not in ftable.\n", name);
-    return (struct ftable_file) { .s = -1 };
+    return (struct ftable_file) {  };
 }
 
 void destroy_ftable(struct ftable *ft)

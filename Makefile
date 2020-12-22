@@ -24,7 +24,7 @@ tfs: $(SOURCES) $(HEADERS) $(PROTO_HEADERS) $(MAIN)
 
 test_ftable: ./src/util.c ./src/ftable.c ./tests/ftable.c
 	mkdir -p $(BIN)/tests/
-	gcc -o $(BIN)/tests/$@.out $(FLAGS) $^ $(LIBS)
+	gcc -o $(BIN)/tests/$@.out $(FLAGS) $(INCLUDE_DIRS) $^ $(LIBS)
 
 test_serialize: ./tests/serialize.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/

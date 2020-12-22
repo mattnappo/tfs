@@ -22,7 +22,6 @@ message FiletableFile { // struct ftable_file
 
 message FiletableBucket { // struct fatble_bucket
     repeated FiletableFile files = 1;
-    uint32 n_entries = 2;
 }
 
 message Filetable { // struct ftable

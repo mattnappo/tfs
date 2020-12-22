@@ -12,7 +12,7 @@
 /* serialize the given pointer into buf */
 unsigned serialize_memory        (uint8_t **buf, struct memory *mem);
 unsigned serialize_ftable_file   (uint8_t **buf, struct ftable_file *file);
-unsigned serialize_ftable_bucket (uint8_t *buf, struct ftable_bucket *bucket);
+unsigned serialize_ftable_bucket (uint8_t **buf, struct ftable_bucket *bucket);
 unsigned serialize_ftable        (uint8_t *buf, struct ftable *ft);
 
 /* deserialize the given buffer and return a pointer to that type */
