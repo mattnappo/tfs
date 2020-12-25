@@ -53,6 +53,7 @@ struct ftable_file bucket_get_file_index(struct ftable_bucket *bucket, int i);
 void add_file_to_bucket(
     struct ftable_file *file, struct ftable_bucket *bucket
 );
+void print_ftable(struct ftable ft);
 void print_ftable_file(struct ftable_file f);
 
 void destroy_ftable(struct ftable *ft);

@@ -123,12 +123,54 @@ void test_ftable()
     free(buffer);
 }
 
+void test_fs()
+{
+    struct fs *tfs = new_fs();
+    struct file tfile1 = new_file("testfile.txt");
+    struct file tfile2 = new_file("testfile2.txt");
+    struct file tfile3 = new_file("Makefile");
+
+    add_file(tfs, tfile2, 0);
+    add_file(tfs, tfile1, 100);
+    add_file(tfs, tfile3, 200);
+    add_file(tfs, tfile3, 600);
+
+    dump(tfs->mem, HEX);
+
+    // get(tfs, "filename");
+    // get(tfs, "testfile.txt");
+    // get(tfs, "testfile2.txt");
+    // get(tfs, "Makefile");
+
+    // Serialize
+    uint8_t *buffer;
+    unsigned slen = serialize_fs(&buffer, tfs);
+
+    // Deserialize
+    struct fs *deserialized = deserialize_fs(buffer, slen);
+    dump(deserialized->mem, HEX);
+
+    get(deserialized, "filename");
+    get(deserialized, "testfile.txt");
+    get(deserialized, "testfile2.txt");
+    get(deserialized, "Makefile");
+    destroy_fs(deserialized);
+
+    free(buffer);
+
+    destroy_file(tfile1);
+    destroy_file(tfile2);
+    destroy_file(tfile3);
+    destroy_fs(tfs);
+}
+
 int main()
 {
     // test_memory();
     // test_ftfile();
     // test_ftbucket();
-    test_ftable();
+    // test_ftable();
+    test_fs();
 
     return 0;
 }

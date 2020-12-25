@@ -54,7 +54,6 @@ struct fs *new_fs()
     struct fs *fs = malloc(sizeof(struct fs));
     fs->mem = new_memory();
     fs->ft  = new_ftable();
-
     return fs;
 }
 

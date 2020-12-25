@@ -117,6 +117,7 @@ struct ftable_bucket *deserialize_ftable_bucket(uint8_t *buf, unsigned len)
     filetable_bucket__free_unpacked(ftb, NULL);
     return ftable_b;
 }
+
 unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
 {
     Filetable sft = FILETABLE__INIT;
@@ -127,8 +128,7 @@ unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
         struct ftable_bucket *bucket = ft->buckets[j]; // This is a temp
 
         buckets[j] = malloc(sizeof(FiletableBucket));
-        filetable_bucket__init(buckets[j]);
-
+        filetable_bucket__init(buckets[j]); 
         FiletableFile **files;
         files = malloc(sizeof(FiletableBucket *) * bucket->n_entries);
         for (int i = 0; i < bucket->n_entries; i++) {
@@ -147,16 +147,15 @@ unsigned serialize_ftable(uint8_t **buf, struct ftable *ft)
     sft.buckets = buckets;
     sft.n_files = ft->n_files;
 
-    // pack
+    // Pack
     unsigned len = filetable__get_packed_size(&sft);
     *buf = malloc(len);
     filetable__pack(&sft, *buf);
     printf("writing %d serialized bytes\n", len);
 
-    // free
+    // Free
     for (int j = 0; j < NUM_BUCKETS; j++) {
         for (int i = 0; i < buckets[j]->n_files; i++) {
-            printf("running i [%d]\n", i);
             free(buckets[j]->files[i]->name);
             free(buckets[j]->files[i]);
         }
@@ -179,7 +178,7 @@ struct ftable *deserialize_ftable(uint8_t *buf, unsigned len)
     struct ftable *dft = new_ftable();
     for (int j = 0; j < NUM_BUCKETS; j++) {
         struct ftable_bucket *new_bucket = new_ftable_bucket();
-        FiletableBucket ftb = *ft->buckets[j]; // current bucket
+        FiletableBucket ftb = *ft->buckets[j]; // Current bucket
         for (int i = 0; i < ftb.n_files; i++) {
             struct ftable_file *ftf = new_ftable_file(
                 ftb.files[i]->name,
@@ -188,7 +187,7 @@ struct ftable *deserialize_ftable(uint8_t *buf, unsigned len)
             );
             add_file_to_bucket(ftf, new_bucket);
         }
-        free(dft->buckets[j]); // free what was already there
+        free(dft->buckets[j]); // Free what was already there
         dft->buckets[j] = new_bucket;
     }
 
@@ -198,46 +197,115 @@ struct ftable *deserialize_ftable(uint8_t *buf, unsigned len)
 
 unsigned serialize_fs(uint8_t **buf, struct fs *fs)
 {
-/*
     Filesystem sfs  = FILESYSTEM__INIT;
-    Submessage smem = MEMORY__INIT;
-    Submessage sft  = FILETABLE__INIT;
+    Memory     smem = MEMORY__INIT;
+    Filetable  sft  = FILETABLE__INIT;
 
-    smem.mem = ft->mem;
+    // Make the memory
     smem.bytes_.data = malloc(fs->mem->s);
     smem.bytes_.len = fs->mem->s;
     memcpy(smem.bytes_.data, fs->mem->bytes, fs->mem->s);
 
-
-
-
-
-    msg.a = &sub1;               // Point msg.a to sub1 data
-
-
-
-
-    void *buf;
-    unsigned len;
-
-    // NOTE: has_b is not required like amessage, therefore check for NULL on deserialze
-    if (argc == 3) {
-        sub2.value = atoi (argv[2]);
-        msg.b = &sub2; // Point msg.b to sub2 data 
+    // Make the ftable
+    FiletableBucket **buckets;
+    buckets = malloc(sizeof(FiletableBucket *) * NUM_BUCKETS);
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        struct ftable_bucket *bucket = fs->ft->buckets[j]; // This is a temp
+        buckets[j] = malloc(sizeof(FiletableBucket));
+        filetable_bucket__init(buckets[j]);
+        FiletableFile **files
+            = malloc(sizeof(FiletableFile *) * bucket->n_entries);
+        for (int i = 0; i < bucket->n_entries; i++) {
+            files[i] = malloc(sizeof(FiletableFile));
+            filetable_file__init(files[i]);
+            struct ftable_file fetched = bucket_get_file_index(bucket, i);
+            files[i]->name = malloc(strlen(fetched.name) + 1);
+            strcpy(files[i]->name, fetched.name);
+            files[i]->s = fetched.s;
+            files[i]->offset = fetched.offset;
+        }
+        buckets[j]->n_files = bucket->n_entries;
+        buckets[j]->files = files;
     }
+    sft.n_buckets = NUM_BUCKETS;
+    sft.buckets = buckets;
+    sft.n_files = fs->ft->n_files;
 
-    len = emessage__get_packed_size (&msg); // This is the calculated packing length
-    buf = malloc (len);                     // Allocate memory
-    emessage__pack (&msg, buf);             // Pack msg, including submessages
+    // Set into final fs to be serialized
+    sfs.ft = &sft;
+    sfs.mem = &smem;
 
-    fprintf(stderr,"Writing %d serialized bytes\n",len); // See the length of message
-    fwrite (buf, len, 1, stdout);           // Write to stdout to allow direct command line piping
+    // Pack
+    unsigned len = filesystem__get_packed_size(&sfs);
+    *buf = malloc(len);
+    filesystem__pack(&sfs, *buf);
+    printf("writing %d serialized bytes\n", len);
 
-    free(buf); // Free the allocated serialized buffer
-    return 0;
-    */
-    return 0;
+    // Free memory and ftable
+    free(smem.bytes_.data);
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        for (int i = 0; i < buckets[j]->n_files; i++) {
+            free(buckets[j]->files[i]->name);
+            free(buckets[j]->files[i]);
+        }
+        free(buckets[j]->files);
+        free(buckets[j]);
+    }
+    free(buckets);
+
+    return len;
 }
 
-struct fs *deserialize_fs(uint8_t *buf, unsigned len);
+struct fs *deserialize_fs(uint8_t *buf, unsigned len)
+{
+    Filesystem *fs = filesystem__unpack(NULL, len, buf);
+    if (fs == NULL) {
+        printf("error unpacking bytes.\n");
+        return NULL;
+    }
+
+    struct fs *dfs = malloc(sizeof(struct fs));
+    dfs->mem = new_memory();
+    memcpy(dfs->mem->bytes, fs->mem->bytes_.data, fs->mem->bytes_.len);
+
+    dfs->ft = new_ftable();
+
+    dfs->ft->n_files = 0;
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        FiletableBucket ftb = *fs->ft->buckets[j]; // Current bucket
+        // dfs->ft->buckets[j] = new_ftable_bucket();
+        for (int i = 0; i < ftb.n_files; i++) {
+            struct ftable_file *ftf = new_ftable_file(
+                ftb.files[i]->name,
+                ftb.files[i]->s,
+                ftb.files[i]->offset
+            );
+            add_file_to_bucket(ftf, dfs->ft->buckets[j]);
+            dfs->ft->n_files++;
+        }
+        // free(dft->buckets[j]); // Free what was already there
+        // dft->buckets[j] = malloc(sizeof(struct ftable_bucket));
+        // dft->buckets[j] = new_bucket;
+    }
+    // destroy_ftable(dft);
+
+    // dfs->ft = dft;
+    // dfs->ft = malloc(sizeof(struct ftable));
+    // dfs->ft = dft;
+    // struct fs *dfs = new_fs();
+    //dfs
+    // dfs->mem = new_memory();
+    // memcpy(dfs->mem->bytes, fs->mem->bytes_.data, fs->mem->bytes_.len);
+
+    // dfs->ft = dft;
+    // // free(dfs->mem);
+    // dfs->mem = malloc(sizeof(fs->mem->bytes_.len));
+    // memcpy(dfs->mem, fs->mem->bytes_.data, fs->mem->bytes_.len);
+
+    // destroy_ftable(dft);
+
+    filesystem__free_unpacked(fs, NULL);
+    return dfs;
+    // return NULL;
+}
 
