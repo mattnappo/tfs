@@ -10,10 +10,9 @@
 // size, and actual data.
 struct file {
     char name[FILENAME_SIZE];
-    char *bytes;
+    uint8_t *bytes;
     size_t s;
 };
-
 
 // A filesystem. Contains the memory itself, and the table
 // of files.

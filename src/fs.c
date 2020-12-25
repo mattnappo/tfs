@@ -9,10 +9,10 @@ struct file new_file(const char *name)
     if (fp) {
         fseek(fp, 0, SEEK_END);
         fsize = ftell(fp);
-        f->bytes = malloc(sizeof(char) * (fsize + 1));
+        f->bytes = malloc(sizeof(uint8_t) * (fsize + 1));
     
         rewind(fp);
-        read_size = fread(f->bytes, sizeof(char), fsize, fp);
+        read_size = fread(f->bytes, sizeof(uint8_t), fsize, fp);
     
         f->bytes[fsize] = '\0';
         f->s = read_size;
@@ -27,7 +27,6 @@ struct file new_file(const char *name)
     
         fclose(fp);
     }
-    // memcpy(f->name, name, strlen(name));
     
     strcpy(f->name, name);
 
@@ -54,7 +53,6 @@ struct fs *new_fs()
     struct fs *fs = malloc(sizeof(struct fs));
     fs->mem = new_memory();
     fs->ft  = new_ftable();
-
     return fs;
 }
 
@@ -83,7 +81,7 @@ struct file get_file(struct fs *fs, char name[])
         printf("'%s' not in fs.\n", name);
         return (struct file) {};
     }
-    char *memory = read(fs->mem, ftfile.s, ftfile.offset);
+    uint8_t *memory = read(fs->mem, ftfile.s, ftfile.offset);
 
     struct file f;
     strcpy(f.name, ftfile.name);

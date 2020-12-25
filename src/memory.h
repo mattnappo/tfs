@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #ifndef MEMORY_H
 #define MEMORY_H
@@ -13,14 +14,15 @@ enum print_mode {
 };
 
 struct memory {
-    char *bytes;
+    uint8_t *bytes;
     size_t s;
 };
 
 struct memory *new_memory();
 void destroy_memory(struct memory *mem);
-int dump(struct memory *mem, enum print_mode m);
-int write(struct memory *mem, char *b, size_t s, size_t offset);
-char *read(struct memory *mem, size_t s, size_t offset);
+
+int      dump  (struct memory *mem, enum print_mode m);
+int      write (struct memory *mem, uint8_t *b, size_t s, size_t offset);
+uint8_t *read  (struct memory *mem, size_t s, size_t offset);
 
 #endif

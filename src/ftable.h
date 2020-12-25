@@ -39,6 +39,7 @@ struct ftable {
 
 struct ftable *new_ftable();
 struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset);
+struct ftable_bucket *new_ftable_bucket();
 
 // Add a file to the ftable
 int ftable_add_file(
@@ -48,6 +49,13 @@ int ftable_add_file(
 
 struct ftable_file ftable_get_file(struct ftable *ft, char name[]);
 int file_in_ftable(struct ftable *ft, char name[]);
+struct ftable_file bucket_get_file_index(struct ftable_bucket *bucket, int i);
+void add_file_to_bucket(
+    struct ftable_file *file, struct ftable_bucket *bucket
+);
+void print_ftable(struct ftable ft);
+void print_ftable_file(struct ftable_file f);
+
 void destroy_ftable(struct ftable *ft);
 void destroy_ftable_file(struct ftable_file *file);
 void destroy_ftable_bucket(struct ftable_bucket *bucket);

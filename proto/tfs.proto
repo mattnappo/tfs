@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+/* frontend types */
+
+message File { // struct file
+    string name = 1;
+    bytes bytes_ = 2;
+    uint32 s = 3;
+}
+
+/* actual types */
+
+message Memory { // struct memory
+    bytes bytes_ = 1;
+}
+
+message FiletableFile { // struct ftable_file
+    string name = 1;
+    uint32 s = 2;
+    uint32 offset = 3;
+}
+
+message FiletableBucket { // struct fatble_bucket
+    repeated FiletableFile files = 1;
+}
+
+message Filetable { // struct ftable
+    repeated FiletableBucket buckets = 1;
+    uint32 n_files = 2;
+}
+
+message Filesystem { // struct fs
+    Memory mem = 1;
+    Filetable ft = 2;
+}
+

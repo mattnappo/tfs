@@ -47,7 +47,7 @@ static struct ftable_bucket *get_bucket_from_key(
     return ft->buckets[fthash(key) % NUM_BUCKETS];
 }
 
-static void add_file_to_bucket(
+void add_file_to_bucket(
     struct ftable_file *file, struct ftable_bucket *bucket
 ) {
     if (bucket->head == NULL) {
@@ -81,6 +81,26 @@ int ftable_add_file(
     return key;
 }
 
+struct ftable_file bucket_get_file_index(struct ftable_bucket *bucket, int i)
+{
+    // TODO: optimize to look backwards if i in second half and forwards if
+    // i in first half (start at tail vs start at head)
+    if (i >= bucket->n_entries) {
+        printf("index %d out of bounds in bucket.", i);
+        return (struct ftable_file) {  };
+    }
+    int j = 0;
+    struct ftable_file *temp = bucket->head;
+    while (temp != NULL) {
+        if (j == i) {
+            return *temp;
+        }
+        temp = temp->next;
+        j++;
+    }
+    return (struct ftable_file) {  };
+}
+
 // Return 1 if the file is in the ftable. Return 0 if not.
 int file_in_ftable(struct ftable *ft, char name[])
 {
@@ -104,7 +124,29 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
         temp = temp->next;
     }
     printf("'%s' not in ftable.\n", name);
-    return (struct ftable_file) { .s = -1 };
+    return (struct ftable_file) {  };
+}
+
+void print_ftable(struct ftable ft)
+{
+    printf("\n===== BEGIN FTABLE =====\n");
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        printf("bucket %d\n", j);
+        struct ftable_file *temp = ft.buckets[j]->head;
+        while (temp != NULL) {
+            print_ftable_file(*temp);
+            temp = temp->next;
+        }
+    }
+    printf("\n===== END FTABLE =====\n");
+}
+
+void print_ftable_file(struct ftable_file f)
+{
+    printf(
+        "ftable file:\n    name: %s\n       s: %lu\n  offset: %lu\n",
+        f.name, f.s, f.offset
+    );
 }
 
 void destroy_ftable(struct ftable *ft)
