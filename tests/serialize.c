@@ -135,7 +135,8 @@ void test_fs()
     add_file(tfs, tfile3, 200);
     add_file(tfs, tfile3, 600);
 
-    dump(tfs->mem, HEX);
+    // dump(tfs->mem, HEX);
+    print_ftable(*tfs->ft);
 
     // get(tfs, "filename");
     // get(tfs, "testfile.txt");
@@ -148,12 +149,13 @@ void test_fs()
 
     // Deserialize
     struct fs *deserialized = deserialize_fs(buffer, slen);
-    dump(deserialized->mem, HEX);
+    // dump(deserialized->mem, HEX);
+    print_ftable(*deserialized->ft);
 
-    get(deserialized, "filename");
-    get(deserialized, "testfile.txt");
-    get(deserialized, "testfile2.txt");
-    get(deserialized, "Makefile");
+    get(deserialized->ft, "filename");
+    get(deserialized->ft, "testfile.txt");
+    get(deserialized->ft, "testfile2.txt");
+    get(deserialized->ft, "Makefile");
     destroy_fs(deserialized);
 
     free(buffer);

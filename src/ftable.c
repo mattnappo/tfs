@@ -127,6 +127,20 @@ struct ftable_file ftable_get_file(struct ftable *ft, char name[])
     return (struct ftable_file) {  };
 }
 
+void print_ftable(struct ftable ft)
+{
+    printf("\n===== BEGIN FTABLE =====\n");
+    for (int j = 0; j < NUM_BUCKETS; j++) {
+        printf("bucket %d\n", j);
+        struct ftable_file *temp = ft.buckets[j]->head;
+        while (temp != NULL) {
+            print_ftable_file(*temp);
+            temp = temp->next;
+        }
+    }
+    printf("\n===== END FTABLE =====\n");
+}
+
 void print_ftable_file(struct ftable_file f)
 {
     printf(
