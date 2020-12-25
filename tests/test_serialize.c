@@ -13,7 +13,7 @@ void test_memory()
     // Make a memory
     uint8_t *s = "test bytes";
     struct memory *mem = new_memory();
-    write(mem, s, 10, 0);
+    mem_write(mem, s, 10, 0);
 
     // Serialize
     uint8_t *serialized_buf;
@@ -26,7 +26,7 @@ void test_memory()
     // Deserialize into a new mem*
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 
-    dump(d_mem, HEX);
+    mem_dump(d_mem, HEX);
     destroy_memory(mem);
     destroy_memory(d_mem);
 }
@@ -135,7 +135,7 @@ void test_fs()
     add_file(tfs, tfile3, 200);
     add_file(tfs, tfile3, 600);
 
-    dump(tfs->mem, HEX);
+    mem_dump(tfs->mem, HEX);
     print_ftable(*tfs->ft);
 
     get(tfs, "filename");
@@ -149,7 +149,7 @@ void test_fs()
 
     // Deserialize
     struct fs *deserialized = deserialize_fs(buffer, slen);
-    dump(deserialized->mem, HEX);
+    mem_dump(deserialized->mem, HEX);
     print_ftable(*deserialized->ft);
 
     get(deserialized->ft, "filename");
