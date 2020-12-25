@@ -69,7 +69,7 @@ void add_file(struct fs *fs, struct file f, size_t offset)
     if (status == -1)
         printf("'%s' is already in the fs.\n", f.name);
     else
-        write(fs->mem, f.bytes, f.s, offset);
+        mem_write(fs->mem, f.bytes, f.s, offset);
 }
 
 int remove_file();
@@ -81,7 +81,7 @@ struct file get_file(struct fs *fs, char name[])
         printf("'%s' not in fs.\n", name);
         return (struct file) {};
     }
-    uint8_t *memory = read(fs->mem, ftfile.s, ftfile.offset);
+    uint8_t *memory = mem_read(fs->mem, ftfile.s, ftfile.offset);
 
     struct file f;
     strcpy(f.name, ftfile.name);

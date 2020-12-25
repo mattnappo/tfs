@@ -6,10 +6,10 @@ void test_fs()
 	struct file tfile = new_file("testfile.txt"); // Make a new file
 
 	add_file(tfs, tfile, 60); // Add the file to the fs
-	dump(tfs->mem, HEX);
+	mem_dump(tfs->mem, HEX);
 	
 	// Test mem reading
-	uint8_t *some_read = read(tfs->mem, 6, 62);
+	uint8_t *some_read = mem_read(tfs->mem, 6, 62);
 	printf("random read: ");
 	for (int i = 0; i < 6; i++) {
         printf("%2x ", some_read[i]);
@@ -50,7 +50,7 @@ void test_fs_simple()
     add_file(tfs, tfile3, 200);
     add_file(tfs, tfile3, 600);
 
-    dump(tfs->mem, HEX);
+    mem_dump(tfs->mem, HEX);
 
     get_fs_(tfs, "filename");
     get_fs_(tfs, "testfile.txt");

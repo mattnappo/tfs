@@ -14,7 +14,7 @@ void destroy_memory(struct memory *mem)
     free(mem);
 }
 
-int dump(struct memory *mem, enum print_mode m)
+int mem_dump(struct memory *mem, enum print_mode m)
 {
     printf("\n=== BEGIN DUMP ===\n");
     for (int i = 0; i < mem->s; i++) {
@@ -29,7 +29,7 @@ int dump(struct memory *mem, enum print_mode m)
     return 0;
 }
 
-int write(
+int mem_write(
     struct memory *mem,
     uint8_t *b,
     size_t s,
@@ -44,7 +44,7 @@ int write(
     return 0;
 }
 
-uint8_t *read(struct memory *mem, size_t s, size_t offset)
+uint8_t *mem_read(struct memory *mem, size_t s, size_t offset)
 {
     uint8_t *buf = calloc(s, 1);
     for (int i = 0; i < s; i++) {
