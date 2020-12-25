@@ -31,7 +31,7 @@ int dump(struct memory *mem, enum print_mode m)
 
 int write(
     struct memory *mem,
-    char *b,
+    uint8_t *b,
     size_t s,
     size_t offset
 ) {
@@ -44,9 +44,9 @@ int write(
     return 0;
 }
 
-char *read(struct memory *mem, size_t s, size_t offset)
+uint8_t *read(struct memory *mem, size_t s, size_t offset)
 {
-    char *buf = calloc(s, 1);
+    uint8_t *buf = calloc(s, 1);
     for (int i = 0; i < s; i++) {
         size_t mem_index = offset + i;
         if (mem_index < mem->s) {

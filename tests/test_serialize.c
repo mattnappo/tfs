@@ -11,9 +11,9 @@ void get(struct ftable *ft, char name[])
 void test_memory()
 {
     // Make a memory
-    char *s = "test bytes";
+    uint8_t *s = "test bytes";
     struct memory *mem = new_memory();
-    write(mem, s, strlen(s), 0);
+    write(mem, s, 10, 0);
 
     // Serialize
     uint8_t *serialized_buf;
@@ -135,13 +135,13 @@ void test_fs()
     add_file(tfs, tfile3, 200);
     add_file(tfs, tfile3, 600);
 
-    // dump(tfs->mem, HEX);
+    dump(tfs->mem, HEX);
     print_ftable(*tfs->ft);
 
-    // get(tfs, "filename");
-    // get(tfs, "testfile.txt");
-    // get(tfs, "testfile2.txt");
-    // get(tfs, "Makefile");
+    get(tfs, "filename");
+    get(tfs, "testfile.txt");
+    get(tfs, "testfile2.txt");
+    get(tfs, "Makefile");
 
     // Serialize
     uint8_t *buffer;
@@ -149,7 +149,7 @@ void test_fs()
 
     // Deserialize
     struct fs *deserialized = deserialize_fs(buffer, slen);
-    // dump(deserialized->mem, HEX);
+    dump(deserialized->mem, HEX);
     print_ftable(*deserialized->ft);
 
     get(deserialized->ft, "filename");
@@ -168,10 +168,10 @@ void test_fs()
 
 int main()
 {
-    // test_memory();
-    // test_ftfile();
-    // test_ftbucket();
-    // test_ftable();
+    test_memory();
+    test_ftfile();
+    test_ftbucket();
+    test_ftable();
     test_fs();
 
     return 0;

@@ -273,7 +273,6 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
     dfs->ft->n_files = 0;
     for (int j = 0; j < NUM_BUCKETS; j++) {
         FiletableBucket ftb = *fs->ft->buckets[j]; // Current bucket
-        // dfs->ft->buckets[j] = new_ftable_bucket();
         for (int i = 0; i < ftb.n_files; i++) {
             struct ftable_file *ftf = new_ftable_file(
                 ftb.files[i]->name,
@@ -283,29 +282,9 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
             add_file_to_bucket(ftf, dfs->ft->buckets[j]);
             dfs->ft->n_files++;
         }
-        // free(dft->buckets[j]); // Free what was already there
-        // dft->buckets[j] = malloc(sizeof(struct ftable_bucket));
-        // dft->buckets[j] = new_bucket;
     }
-    // destroy_ftable(dft);
-
-    // dfs->ft = dft;
-    // dfs->ft = malloc(sizeof(struct ftable));
-    // dfs->ft = dft;
-    // struct fs *dfs = new_fs();
-    //dfs
-    // dfs->mem = new_memory();
-    // memcpy(dfs->mem->bytes, fs->mem->bytes_.data, fs->mem->bytes_.len);
-
-    // dfs->ft = dft;
-    // // free(dfs->mem);
-    // dfs->mem = malloc(sizeof(fs->mem->bytes_.len));
-    // memcpy(dfs->mem, fs->mem->bytes_.data, fs->mem->bytes_.len);
-
-    // destroy_ftable(dft);
 
     filesystem__free_unpacked(fs, NULL);
     return dfs;
-    // return NULL;
 }
 

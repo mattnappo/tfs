@@ -22,11 +22,16 @@ tfs: $(SOURCES) $(HEADERS) $(PROTO_HEADERS) $(MAIN)
 
 # ----- TESTS ----- #
 
-test_ftable: ./src/util.c ./src/ftable.c ./tests/ftable.c
-	mkdir -p $(BIN)/tests/
-	gcc -o $(BIN)/tests/$@.out $(FLAGS) $(INCLUDE_DIRS) $^ $(LIBS)
+test:
+	make clean
+	make test_main      && ./memtest.sh ./bin/tests/test_main.out
+	make test_serialize && ./memtest.sh ./bin/tests/test_serialize.out
 
-test_serialize: ./tests/serialize.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+test_main: ./tests/test_main.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
+test_serialize: ./tests/test_main.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
