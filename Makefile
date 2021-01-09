@@ -31,7 +31,7 @@ test_main: ./tests/test_main.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
-test_serialize: ./tests/test_main.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+test_serialize: ./tests/test_serialize.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 

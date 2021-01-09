@@ -158,7 +158,36 @@ void test_fs()
     get(deserialized->ft, "Makefile");
     destroy_fs(deserialized);
 
+    // Test writing to file
+    write_fs("/home/matt/git/awesome.fs", tfs);
+
     free(buffer);
+
+    destroy_file(tfile1);
+    destroy_file(tfile2);
+    destroy_file(tfile3);
+    destroy_fs(tfs);
+}
+
+void test_io()
+{
+    struct fs *tfs = new_fs();
+    struct file tfile1 = new_file("testfile.txt");
+    struct file tfile2 = new_file("testfile2.txt");
+    struct file tfile3 = new_file("Makefile");
+
+    add_file(tfs, tfile2, 0);
+    add_file(tfs, tfile1, 100);
+    add_file(tfs, tfile3, 200);
+    add_file(tfs, tfile3, 600);
+
+    // get(tfs, "filename");
+    // get(tfs, "testfile.txt");
+    // get(tfs, "testfile2.txt");
+    // get(tfs, "Makefile");
+
+    int status = write_fs("/home/matt/git/awesome.fs", tfs);
+    printf("write status: %d\n", status);
 
     destroy_file(tfile1);
     destroy_file(tfile2);
@@ -168,11 +197,12 @@ void test_fs()
 
 int main()
 {
-    test_memory();
-    test_ftfile();
-    test_ftbucket();
-    test_ftable();
-    test_fs();
+    // test_memory();
+    // test_ftfile();
+    // test_ftbucket();
+    // test_ftable();
+    // test_fs();
+    test_io();
 
     return 0;
 }

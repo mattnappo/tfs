@@ -23,4 +23,8 @@ struct ftable_bucket *deserialize_ftable_bucket (uint8_t *buf, unsigned len);
 struct ftable        *deserialize_ftable        (uint8_t *buf, unsigned len);
 struct fs            *deserialize_fs            (uint8_t *buf, unsigned len);
 
+/* serialize to disk */
+int write_fs(const char *filename, struct fs *fs);
+
+
 #endif

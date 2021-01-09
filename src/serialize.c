@@ -288,3 +288,19 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
     return dfs;
 }
 
+int write_fs(const char *filename, struct fs *fs)
+{
+    uint8_t *buffer;
+    unsigned slen = serialize_fs(&buffer, fs);
+
+    FILE *fd = fopen(filename, "w");
+    size_t len = fwrite(buffer, 1, slen, fd);
+    printf("writing to file \n");
+    fclose(fd);
+    if (len != slen) {
+        printf("error writing fs to file.\n");
+        return -1;
+    }
+    return 0;
+}
+
