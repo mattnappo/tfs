@@ -300,6 +300,7 @@ int write_fs(const char *filename, struct fs *fs)
         printf("error writing fs to file.\n");
         return -1;
     }
+    free(buffer);
     return 0;
 }
 
@@ -309,5 +310,6 @@ struct fs *read_fs(const char* filename)
     uint8_t *buffer = calloc(MAX_IO_SIZE, 1);
     size_t rlen = fread(buffer, 1, MAX_IO_SIZE, fd); 
     struct fs *dfs = deserialize_fs(buffer, rlen);
+    free(buffer);
     return dfs;
 }

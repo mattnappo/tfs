@@ -63,7 +63,7 @@ void destroy_fs(struct fs *fs)
     free(fs);
 }
 
-void add_file(struct fs *fs, struct file f, size_t offset)
+void fs_add_file(struct fs *fs, struct file f, size_t offset)
 {
     int status = ftable_add_file(fs->ft, f.name, f.s, offset);
     if (status == -1)
@@ -72,9 +72,9 @@ void add_file(struct fs *fs, struct file f, size_t offset)
         mem_write(fs->mem, f.bytes, f.s, offset);
 }
 
-int remove_file();
+int fs_remove_file();
 
-struct file get_file(struct fs *fs, char *name)
+struct file fs_get_file(struct fs *fs, char *name)
 {
     struct ftable_file ftfile = ftable_get_file(fs->ft, name);
     if (ftfile.s == -1) {
@@ -94,13 +94,4 @@ struct file get_file(struct fs *fs, char *name)
 }
 
 void fs_print_file(struct fs *fs, char *name, int show_mem);
-// {
-//     struct file f = get_file(fs, name);
-//     printf("\nname: %s\n  s: %zu\n  offset: %zu\n", f.name, f.s, f.offset);
-//     if (show_mem == 1) {
-//         printf("mem:\n");
-//         // TODO
-//     }
-//     printf("\n");
-// }
-// 
+

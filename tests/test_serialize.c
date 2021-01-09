@@ -131,10 +131,10 @@ void test_fs()
     struct file tfile2 = new_file("testfile2.txt");
     struct file tfile3 = new_file("Makefile");
 
-    add_file(tfs, tfile2, 0);
-    add_file(tfs, tfile1, 100);
-    add_file(tfs, tfile3, 200);
-    add_file(tfs, tfile3, 600);
+    fs_add_file(tfs, tfile2, 0);
+    fs_add_file(tfs, tfile1, 100);
+    fs_add_file(tfs, tfile3, 200);
+    fs_add_file(tfs, tfile3, 600);
 
     mem_dump(tfs->mem, HEX);
     print_ftable(*tfs->ft);
@@ -174,9 +174,9 @@ void test_io()
     struct file tfile2 = new_file("testfile2.txt");
     struct file tfile3 = new_file("Makefile");
 
-    add_file(tfs, tfile1, 0);
-    add_file(tfs, tfile2, 100);
-    add_file(tfs, tfile3, 200);
+    fs_add_file(tfs, tfile1, 0);
+    fs_add_file(tfs, tfile2, 100);
+    fs_add_file(tfs, tfile3, 200);
 
     destroy_file(tfile1);
     destroy_file(tfile2);
@@ -200,11 +200,11 @@ void test_io()
 
 int main()
 {
-    // test_memory();
-    // test_ftfile();
-    // test_ftbucket();
-    // test_ftable();
-    // test_fs();
+    test_memory();
+    test_ftfile();
+    test_ftbucket();
+    test_ftable();
+    test_fs();
     test_io();
 
     return 0;

@@ -5,7 +5,7 @@ void test_fs()
 	struct fs *tfs = new_fs(); // Make the fs
 	struct file tfile = new_file("testfile.txt"); // Make a new file
 
-	add_file(tfs, tfile, 60); // Add the file to the fs
+	fs_add_file(tfs, tfile, 60); // Add the file to the fs
 	mem_dump(tfs->mem, HEX);
 	
 	// Test mem reading
@@ -17,7 +17,7 @@ void test_fs()
 	printf("\n");
 
     // Get a file    
-	struct file file_read = get_file(tfs, "testfile.txt");
+	struct file file_read = fs_get_file(tfs, "testfile.txt");
     print_file(file_read);
 
     free(some_read);
@@ -29,7 +29,7 @@ void test_fs()
 void get_fs_(struct fs *tfs, char fname[])
 {
     printf("\n\n");
-    struct file tread = get_file(tfs, fname);
+    struct file tread = fs_get_file(tfs, fname);
     print_file(tread);
     for (int i = 0; i < tread.s; i++)
         printf("%c", tread.bytes[i]);
@@ -45,10 +45,10 @@ void test_fs_simple()
     struct file tfile2 = new_file("testfile2.txt");
     struct file tfile3 = new_file("Makefile");
 
-    add_file(tfs, tfile2, 0);
-    add_file(tfs, tfile1, 100);
-    add_file(tfs, tfile3, 200);
-    add_file(tfs, tfile3, 600);
+    fs_add_file(tfs, tfile2, 0);
+    fs_add_file(tfs, tfile1, 100);
+    fs_add_file(tfs, tfile3, 200);
+    fs_add_file(tfs, tfile3, 600);
 
     mem_dump(tfs->mem, HEX);
 

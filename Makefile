@@ -24,6 +24,7 @@ tfs: $(SOURCES) $(HEADERS) $(PROTO_HEADERS) $(MAIN)
 
 test:
 	make clean
+	make                && ./memtest.sh ./bin/tfs.out
 	make test_main      && ./memtest.sh ./bin/tests/test_main.out
 	make test_serialize && ./memtest.sh ./bin/tests/test_serialize.out
 
