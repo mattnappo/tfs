@@ -8,6 +8,7 @@
 #include "fs.h"
 
 #define MAX_MEM_SIZE MEM_SIZE+32
+#define MAX_IO_SIZE 100000
 
 /* serialize the given pointer into buf */
 unsigned serialize_memory        (uint8_t **buf, struct memory *mem);
@@ -24,7 +25,7 @@ struct ftable        *deserialize_ftable        (uint8_t *buf, unsigned len);
 struct fs            *deserialize_fs            (uint8_t *buf, unsigned len);
 
 /* serialize to disk */
-int write_fs(const char *filename, struct fs *fs);
-
+int        write_fs (const char *filename, struct fs *fs);
+struct fs *read_fs  (const char *filename);
 
 #endif

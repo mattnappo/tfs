@@ -11,7 +11,8 @@ void get(struct ftable *ft, char name[])
 void test_memory()
 {
     // Make a memory
-    uint8_t *s = "test bytes";
+    uint8_t *s = (uint8_t *)"test bytes\0";
+
     struct memory *mem = new_memory();
     mem_write(mem, s, 10, 0);
 
@@ -138,10 +139,10 @@ void test_fs()
     mem_dump(tfs->mem, HEX);
     print_ftable(*tfs->ft);
 
-    get(tfs, "filename");
-    get(tfs, "testfile.txt");
-    get(tfs, "testfile2.txt");
-    get(tfs, "Makefile");
+    get(tfs->ft, "filename");
+    get(tfs->ft, "testfile.txt");
+    get(tfs->ft, "testfile2.txt");
+    get(tfs->ft, "Makefile");
 
     // Serialize
     uint8_t *buffer;
@@ -158,9 +159,6 @@ void test_fs()
     get(deserialized->ft, "Makefile");
     destroy_fs(deserialized);
 
-    // Test writing to file
-    write_fs("/home/matt/git/awesome.fs", tfs);
-
     free(buffer);
 
     destroy_file(tfile1);
@@ -176,23 +174,28 @@ void test_io()
     struct file tfile2 = new_file("testfile2.txt");
     struct file tfile3 = new_file("Makefile");
 
-    add_file(tfs, tfile2, 0);
-    add_file(tfs, tfile1, 100);
+    add_file(tfs, tfile1, 0);
+    add_file(tfs, tfile2, 100);
     add_file(tfs, tfile3, 200);
-    add_file(tfs, tfile3, 600);
-
-    // get(tfs, "filename");
-    // get(tfs, "testfile.txt");
-    // get(tfs, "testfile2.txt");
-    // get(tfs, "Makefile");
-
-    int status = write_fs("/home/matt/git/awesome.fs", tfs);
-    printf("write status: %d\n", status);
 
     destroy_file(tfile1);
     destroy_file(tfile2);
     destroy_file(tfile3);
+
+    get(tfs->ft, "testfile.txt");
+    get(tfs->ft, "testfile2.txt");
+    get(tfs->ft, "Makefile");
+
+    int status = write_fs("test_fs.fs", tfs);
+    printf("fs write status: %d\n", status);
     destroy_fs(tfs);
+
+    struct fs *dfs2 = read_fs("test_fs.fs");
+    get(dfs2->ft, "testfile.txt");
+    get(dfs2->ft, "testfile2.txt");
+    get(dfs2->ft, "Makefile");
+
+    destroy_fs(dfs2);
 }
 
 int main()

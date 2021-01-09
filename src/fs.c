@@ -74,7 +74,7 @@ void add_file(struct fs *fs, struct file f, size_t offset)
 
 int remove_file();
 
-struct file get_file(struct fs *fs, char name[])
+struct file get_file(struct fs *fs, char *name)
 {
     struct ftable_file ftfile = ftable_get_file(fs->ft, name);
     if (ftfile.s == -1) {
@@ -93,3 +93,14 @@ struct file get_file(struct fs *fs, char name[])
     return f;
 }
 
+void fs_print_file(struct fs *fs, char *name, int show_mem);
+// {
+//     struct file f = get_file(fs, name);
+//     printf("\nname: %s\n  s: %zu\n  offset: %zu\n", f.name, f.s, f.offset);
+//     if (show_mem == 1) {
+//         printf("mem:\n");
+//         // TODO
+//     }
+//     printf("\n");
+// }
+// 

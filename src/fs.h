@@ -35,7 +35,8 @@ void print_file(struct file f);
 int remove_file(struct fs *fs, struct file f);
 
 // Get a file from an fs
-struct file get_file(struct fs *fs, char name[]);
+struct file get_file   (struct fs *fs, char *name);
+void fs_print_file(struct fs *fs, char *name, int show_mem);
 
 // Construct a file given a filename
 struct file new_file(const char *name);

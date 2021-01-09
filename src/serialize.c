@@ -295,7 +295,6 @@ int write_fs(const char *filename, struct fs *fs)
 
     FILE *fd = fopen(filename, "w");
     size_t len = fwrite(buffer, 1, slen, fd);
-    printf("writing to file \n");
     fclose(fd);
     if (len != slen) {
         printf("error writing fs to file.\n");
@@ -304,3 +303,11 @@ int write_fs(const char *filename, struct fs *fs)
     return 0;
 }
 
+struct fs *read_fs(const char* filename)
+{
+    FILE *fd = fopen(filename, "r");
+    uint8_t *buffer = calloc(MAX_IO_SIZE, 1);
+    size_t rlen = fread(buffer, 1, MAX_IO_SIZE, fd); 
+    struct fs *dfs = deserialize_fs(buffer, rlen);
+    return dfs;
+}
