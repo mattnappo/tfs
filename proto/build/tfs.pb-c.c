@@ -341,7 +341,7 @@ const ProtobufCMessageDescriptor file__descriptor =
   (ProtobufCMessageInit) file__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor memory__field_descriptors[2] =
+static const ProtobufCFieldDescriptor memory__field_descriptors[1] =
 {
   {
     "bytes_",
@@ -355,27 +355,14 @@ static const ProtobufCFieldDescriptor memory__field_descriptors[2] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
-  {
-    "s",
-    2,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
-    0,   /* quantifier_offset */
-    offsetof(Memory, s),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
 };
 static const unsigned memory__field_indices_by_name[] = {
   0,   /* field[0] = bytes_ */
-  1,   /* field[1] = s */
 };
 static const ProtobufCIntRange memory__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 1 }
 };
 const ProtobufCMessageDescriptor memory__descriptor =
 {
@@ -385,7 +372,7 @@ const ProtobufCMessageDescriptor memory__descriptor =
   "Memory",
   "",
   sizeof(Memory),
-  2,
+  1,
   memory__field_descriptors,
   memory__field_indices_by_name,
   1,  memory__number_ranges,
@@ -456,7 +443,7 @@ const ProtobufCMessageDescriptor filetable_file__descriptor =
   (ProtobufCMessageInit) filetable_file__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor filetable_bucket__field_descriptors[2] =
+static const ProtobufCFieldDescriptor filetable_bucket__field_descriptors[1] =
 {
   {
     "files",
@@ -470,27 +457,14 @@ static const ProtobufCFieldDescriptor filetable_bucket__field_descriptors[2] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
-  {
-    "n_entries",
-    2,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
-    0,   /* quantifier_offset */
-    offsetof(FiletableBucket, n_entries),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
 };
 static const unsigned filetable_bucket__field_indices_by_name[] = {
   0,   /* field[0] = files */
-  1,   /* field[1] = n_entries */
 };
 static const ProtobufCIntRange filetable_bucket__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 1 }
 };
 const ProtobufCMessageDescriptor filetable_bucket__descriptor =
 {
@@ -500,7 +474,7 @@ const ProtobufCMessageDescriptor filetable_bucket__descriptor =
   "FiletableBucket",
   "",
   sizeof(FiletableBucket),
-  2,
+  1,
   filetable_bucket__field_descriptors,
   filetable_bucket__field_indices_by_name,
   1,  filetable_bucket__number_ranges,

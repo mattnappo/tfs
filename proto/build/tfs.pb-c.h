@@ -44,11 +44,10 @@ struct  _Memory
 {
   ProtobufCMessage base;
   ProtobufCBinaryData bytes_;
-  uint32_t s;
 };
 #define MEMORY__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&memory__descriptor) \
-    , {0,NULL}, 0 }
+    , {0,NULL} }
 
 
 struct  _FiletableFile
@@ -68,11 +67,10 @@ struct  _FiletableBucket
   ProtobufCMessage base;
   size_t n_files;
   FiletableFile **files;
-  uint32_t n_entries;
 };
 #define FILETABLE_BUCKET__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&filetable_bucket__descriptor) \
-    , 0,NULL, 0 }
+    , 0,NULL }
 
 
 struct  _Filetable
