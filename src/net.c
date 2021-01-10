@@ -86,10 +86,11 @@ int init_server(char *port)
     free(request);
     /* ----- */
 
-    // Serve
+    // Serve (will go in handler func)
     struct lbuffer temp_fs = get_temp_fs();
     uint8_t *tfs_buf = temp_fs.buf;
-    size_t tfs_len = temp_fs.len; // Use this instead of the strlen
+    size_t tfs_len = temp_fs.len;
+
     const char *response =
         "HTTP/1.1 200 OK\r\n"
         "Connection: close\r\n"
@@ -100,7 +101,7 @@ int init_server(char *port)
 
     for (int i = 0; i < tfs_len; i++) {
         char b[4];
-        sprintf(b, "%X_", tfs_buf[i]);
+        sprintf(b, "%X ", tfs_buf[i]);
         if (send(client_sd, b, 1, 0) != 1) {
             fprintf(stderr, "failed to write all fs bytes");
             break;
