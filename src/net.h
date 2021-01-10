@@ -33,7 +33,7 @@ struct tfs_header {
     enum tfs_type data_type;
 };
 
-int init_server();
+int init_server(char *port);
 void send_fs();
 void send_file();
 void recv_fs();

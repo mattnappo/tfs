@@ -23,7 +23,7 @@ static struct lbuffer get_temp_fs()
     return lbuff;
 }
 
-int init_server()
+int init_server(char *port)
 {
     // Create server socket sd
     struct addrinfo hints;
@@ -32,7 +32,8 @@ int init_server()
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo *bind_addr;
-    getaddrinfo(0, LISTEN_PORT, &hints, &bind_addr);
+    // getaddrinfo(0, LISTEN_PORT, &hints, &bind_addr);
+    getaddrinfo(0, port, &hints, &bind_addr);
     SOCKET sd;
     sd = socket(bind_addr->ai_family, bind_addr->ai_socktype,
         bind_addr->ai_protocol);
@@ -46,6 +47,7 @@ int init_server()
     status = bind(sd, bind_addr->ai_addr, bind_addr->ai_addrlen);
     if (status) {
         fprintf(stderr, "bind failed: %d\n", GETSOCKETERRNO());
+        freeaddrinfo(bind_addr);
         return 1;
     }
     freeaddrinfo(bind_addr);
@@ -80,22 +82,41 @@ int init_server()
     printf("received %d bytes.\n", reqlen);
     printf("%.*s", reqlen, request);
 
+    /* process the request */
+    free(request);
+    /* ----- */
+
     // Serve
-    // struct lbuffer temp_fs = get_temp_fs();
-    // uint8_t *tfs_buf = temp_fs.buf;
-    // size_t tfs_len = temp_fs.len; // Use this instead of the strlen
-    // const char *response = "test string";
+    struct lbuffer temp_fs = get_temp_fs();
+    uint8_t *tfs_buf = temp_fs.buf;
+    size_t tfs_len = temp_fs.len; // Use this instead of the strlen
     const char *response =
         "HTTP/1.1 200 OK\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain\r\n\r\n"
-        "It works";
+        "fs bytes: ";
     int reslen = send(client_sd, response, strlen(response), 0); // strlen warning
     printf("sent %d of %d bytes.\n", reslen, (int) strlen(response));
+
+    for (int i = 0; i < tfs_len; i++) {
+        char b[4];
+        sprintf(b, "%X_", tfs_buf[i]);
+        if (send(client_sd, b, 1, 0) != 1) {
+            fprintf(stderr, "failed to write all fs bytes");
+            break;
+        }
+        //printf("%X ", tfs_buf[i]);
+    }
+    printf("wrote all %ld fs bytes\n", tfs_len);
+
+    // reslen = send(client_sd, bytes, strlen(), 0); // strlen warning
+    // printf("sent %d of %d bytes.\n", reslen, (int) 10000);
+    
 
     // Cleanup
     CLOSESOCKET(client_sd);
     CLOSESOCKET(sd);
+    free(tfs_buf);
 
     return 0;
 }
