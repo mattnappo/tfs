@@ -21,7 +21,7 @@
 #define SOCKET int
 #define GETSOCKETERRNO() (errno)
 
-#define LISTEN_PORT "8080"
+// #define LISTEN_PORT "8080"
 #define REQ_SIZE 100000
  
 enum tfs_type {
@@ -31,6 +31,16 @@ enum tfs_type {
 
 struct tfs_header {
     enum tfs_type data_type;
+};
+
+struct tfs_req {
+    struct tfs_header header;
+    uint8_t fsid[FSID_LEN];
+};
+
+struct tfs_res {
+    struct tfs_header header;
+
 };
 
 int init_server(char *port);
