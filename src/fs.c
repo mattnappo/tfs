@@ -48,12 +48,25 @@ void print_file(struct file f)
     printf("\n");
 }
 
+static void recalc_id(struct fs *fs);
+
 struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
     fs->mem = new_memory();
     fs->ft  = new_ftable();
+    memset(fs->id, 0, FSID_LEN);
+    recalc_id(fs);
     return fs;
+}
+
+static void recalc_id(struct fs *fs)
+{
+    uint8_t digest[FSID_LEN];
+    memset(digest, 0, FSID_LEN);
+    uint8_t t = time(NULL);
+    const uint8_t *key = (const uint8_t *) &t;
+    calc_md5(key, sizeof(key), digest);
 }
 
 void destroy_fs(struct fs *fs)

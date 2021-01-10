@@ -4,7 +4,7 @@ EXEC := $(BIN)/tfs.out
 MAIN := ./cli.c
 
 FLAGS   := -Wall -g
-LIBS    := -lm -L/usr/local/lib -lprotobuf-c
+LIBS    := -lm -L/usr/local/lib -lprotobuf-c -L/usr/lib -lcrypto
 INCLUDE := -I/usr/local/include
 
 SOURCES := $(shell find $(SRC) -name '*.c')

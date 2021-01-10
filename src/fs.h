@@ -3,6 +3,11 @@
 
 #include "memory.h"
 #include "ftable.h"
+#include "crypto.h"
+
+#include <time.h>
+
+#define FSID_LEN HASH_LEN
 
 // A frontend, end-user-ready file. struct fs does not contain this.
 struct file {
@@ -15,6 +20,7 @@ struct file {
 struct fs {
     struct memory *mem;
     struct ftable *ft;
+    uint8_t id[FSID_LEN];
 };
 
 /* fs methods */
