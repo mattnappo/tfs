@@ -36,5 +36,13 @@ test_serialize: ./tests/test_serialize.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
+test_server: ./tests/test_server.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
+test_client: ./tests/test_client.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
 clean:
 	rm -rf bin/*
