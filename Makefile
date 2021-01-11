@@ -44,5 +44,9 @@ test_client: ./tests/test_client.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
+test_protocol: ./tests/test_protocol.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
 clean:
 	rm -rf bin/*

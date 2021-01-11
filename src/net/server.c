@@ -1,4 +1,4 @@
-#include "server.h"
+#include "net.h"
 
 struct lbuffer {
     uint8_t *buf;
@@ -99,15 +99,14 @@ int handle_conn(SOCKET client)
 
     /* process the request */
     free(request);
-    /* ----- */
+    /* ------------------- */
 
     struct lbuffer temp_fs = get_temp_fs();
     uint8_t *tfs_buf = temp_fs.buf;
-    // size_t tfs_len = temp_fs.len;
+    size_t tfs_len = temp_fs.len;
 
-    const char *response = NULL;
-    int reslen = send(client, response, strlen(response), 0); // strlen warning
-    printf("sent %d of %d bytes.\n", reslen, (int) strlen(response));
+    int reslen = send(client, (const void *)tfs_buf, tfs_len, 0);
+    printf("sent %d of %lu bytes.\n", reslen, tfs_len);
 
     free(tfs_buf);
 
