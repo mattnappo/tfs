@@ -37,15 +37,20 @@ struct file new_file(const char *name)
 
 void destroy_file(struct file f) { free(f.bytes); }
 
-void print_file(struct file f)
+void print_file(struct file f, enum print_mode as_hex)
 {
     printf("fs file:\n  name: %s\n  size: %ld\n  bytes: ", f.name, f.s);
-
-    // TODO: make a temp memory and use dump here.
-    for (int i = 0; i < f.s; i++) {
-        printf("%2x ", f.bytes[i]);
+    if (as_hex) {
+        for (int i = 0; i < f.s; i++) {
+            printf("%2x ", f.bytes[i]);
+        }
+        printf("\n");
+    } else {
+        for (int i = 0; i < f.s; i++) {
+            printf("%c", f.bytes[i]);
+        }
+        printf("\n");
     }
-    printf("\n");
 }
 
 static void recalc_id(struct fs *fs);

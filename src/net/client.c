@@ -41,7 +41,7 @@ SOCKET init_client(char *ip, char *port)
     return server_sd;
 }
 
-struct fs *recv_fs(SOCKET server)
+struct fs *client_get_fs(SOCKET server)
 {
     // First, make the request to get an fs
     uint8_t tfsid[FSID_LEN];
@@ -52,15 +52,17 @@ struct fs *recv_fs(SOCKET server)
     pack_req(&packed, req);
 
     // Then, send it
-    int bytes_sent = send(server, req, REQ_LEN, 0);
-    if (bytes_sent != ) {
+    int bytes_sent = send(server, packed, REQ_LEN, 0);
+    if (bytes_sent != REQ_LEN) {
         fprintf(stderr, "send failed: did not send all req bytes\n");
         print_req(req);
         return NULL;
     }
 
-    // Finally, receive the res
-
-    return NULL;
-
+    // Finally, read from server and make fs
+    uint8_t recv_fs_buffer[RES_LEN];
+    int bytes_recv = recv(server, recv_fs_buffer, RES_LEN, 0);
+    printf("recv %d bytes\n", bytes_recv);
+    struct fs *dfs = deserialize_fs(recv_fs_buffer, bytes_recv); // Because its raw for now
+    return dfs;
 }

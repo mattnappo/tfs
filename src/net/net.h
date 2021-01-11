@@ -22,7 +22,7 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define RES_SIZE 100000
+#define RES_LEN 100000
 
 // In bytes, not bits
 #define REQ_TYPE_O 0
@@ -64,11 +64,10 @@ void print_res(struct tfs_res r);
 
 /* server */
 int init_server(char *port);
-int handle_conn(SOCKET client);
 
 /* client */
 SOCKET init_client(char *ip, char *port);
-struct fs *recv_fs(SOCKET server);
+struct fs *client_get_fs(SOCKET server);
 int send_fs();
 int send_file();
 

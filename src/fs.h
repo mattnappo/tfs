@@ -24,17 +24,17 @@ struct fs {
 };
 
 /* fs methods */
-struct fs *new_fs();
-void fs_add_file(struct fs *fs, struct file f, size_t offset);
-struct file fs_get_file(struct fs *fs, char *name);
-int  fs_remove_file(struct fs *fs, struct file f);
-void fs_print_file(struct fs *fs, char *name, int show_mem);
-void destroy_fs(struct fs *fs);
+struct fs*  new_fs         ();
+void        fs_add_file    (struct fs *fs, struct file f, size_t offset);
+struct file fs_get_file    (struct fs *fs, char *name);
+int         fs_remove_file (struct fs *fs, struct file f);
+void        fs_print_file  (struct fs *fs, char *name, int show_mem);
+void        destroy_fs     (struct fs *fs);
 
 /* front end file functions */
-void print_file(struct file f);
-struct file new_file(const char *name);
-void destroy_file(struct file f);
+void        print_file   (struct file f, enum print_mode as_hex);
+struct file new_file     (const char *name);
+void        destroy_file (struct file f);
 
 #endif
 

@@ -18,7 +18,7 @@ void test_fs()
 
     // Get a file    
 	struct file file_read = fs_get_file(tfs, "testfile.txt");
-    print_file(file_read);
+    print_file(file_read, HEX);
 
     free(some_read);
     free(file_read.bytes);
@@ -30,7 +30,7 @@ void get_fs_(struct fs *tfs, char fname[])
 {
     printf("\n\n");
     struct file tread = fs_get_file(tfs, fname);
-    print_file(tread);
+    print_file(tread, HEX);
     for (int i = 0; i < tread.s; i++)
         printf("%c", tread.bytes[i]);
     printf("\n");

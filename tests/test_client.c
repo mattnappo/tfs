@@ -14,7 +14,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    recv_fs(server);
+    struct fs *fs = client_get_fs(server);
+    struct file f = fs_get_file(fs, "Makefile");
+    print_file(f, DECIMAL);
 
-    return status;
+    destroy_fs(fs);
+    return 0;
 }

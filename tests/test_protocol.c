@@ -1,6 +1,6 @@
 #include "net/net.h"
 
-int test_res()
+int test_req()
 {
     // Make the request
     uint8_t tfsid[FSID_LEN];
@@ -34,7 +34,7 @@ int test_res()
     return 0;
 }
 
-int test_req()
+int test_res()
 {
 
     return 0;
@@ -43,10 +43,10 @@ int test_req()
 int main()
 {
     int status;
-    status = test_res();
+    status = test_req();
     printf("status: %d\n", status);
 
-    // status = test_req();
+    // status = test_res();
     // printf("status: %d\n", status);
 
     return status;

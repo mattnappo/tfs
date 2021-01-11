@@ -23,6 +23,7 @@ struct tfs_req unpack_req(uint8_t *req)
     memcpy(fsid, req+1, FSID_LEN);
     struct tfs_req dreq = { .type = type };
     memcpy(dreq.fsid, fsid, FSID_LEN);
+    free(fsid);
     return dreq;
 }
 

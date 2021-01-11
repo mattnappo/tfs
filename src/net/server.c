@@ -5,6 +5,9 @@ struct lbuffer {
     size_t len;
 };
 
+static int handle_conn(SOCKET client);
+static int handle_req(SOCKET client, struct tfs_req r);
+
 static struct lbuffer get_temp_fs()
 {
     struct fs *tfs = new_fs();
@@ -73,6 +76,7 @@ int init_server(char *port)
         client_len, addr_buffer, sizeof(addr_buffer), 0, 0, NI_NUMERICHOST);
     printf("%s\n", addr_buffer);
 
+    // Handle the connection
     status = handle_conn(client_sd);
     if (status != 0) {
         fprintf(stderr, "handle_conn failed: %d\n", status);
@@ -86,29 +90,55 @@ int init_server(char *port)
     return 0;
 }
 
-int handle_conn(SOCKET client)
+static int handle_req(SOCKET client, struct tfs_req r)
+{
+    switch (r.type) {
+    // TODO: Really, this will send a res (once I implemented ress)
+    // instead of just the raw fs bytes
+    case TFS_GET_FS: {
+        struct lbuffer temp_fs = get_temp_fs();
+        uint8_t *tfs_buf = temp_fs.buf;
+        size_t tfs_len = temp_fs.len;
+        int reslen = send(client, (const void *) tfs_buf, tfs_len, 0);
+        printf("sent %d of %lu bytes.\n", reslen, tfs_len);
+        free(tfs_buf);
+        break;
+    }
+    case TFS_GET_FILE:
+        break;
+
+    case TFS_PUT_FILE:
+        break;
+
+    default:
+        fprintf(stderr, "invalid request type option: %d\n", r.type);
+        return 1;
+    }
+    return 0;
+}
+
+static int handle_conn(SOCKET client)
 {
     // Read request
     uint8_t *request = calloc(REQ_LEN, 1);
     int reqlen = recv(client, request, REQ_LEN, 0);
-    if (reqlen <= 0) {
-        fprintf(stderr, "recv failed: %d\n", reqlen);
+    if (reqlen != REQ_LEN) {
+        fprintf(stderr, "recv failed: %d. Did not recv all %d bytes. \n", reqlen, REQ_LEN);
+        return 1;
     }
     printf("received %d bytes.\n", reqlen);
     printf("%.*s", reqlen, request);
 
     /* process the request */
+    int status;
+    struct tfs_req unpacked_req = unpack_req(request);
+    print_req(unpacked_req);
+    status = handle_req(client, unpacked_req);
+    if (status > 0) {
+        fprintf(stderr, "handle_req failed\n");
+    }
     free(request);
-    /* ------------------- */
-
-    struct lbuffer temp_fs = get_temp_fs();
-    uint8_t *tfs_buf = temp_fs.buf;
-    size_t tfs_len = temp_fs.len;
-
-    int reslen = send(client, (const void *)tfs_buf, tfs_len, 0);
-    printf("sent %d of %lu bytes.\n", reslen, tfs_len);
-
-    free(tfs_buf);
 
     return 0;
 }
+
