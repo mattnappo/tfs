@@ -10,7 +10,7 @@ int test_req()
         printf("%x ", tfsid[c]);
     printf("\n");
 
-    struct tfs_req req = { .type = TFS_PUT_FILE };
+    struct tfs_req req = { .type = REQ_PUT_FILE };
     memcpy(req.fsid, tfsid, FSID_LEN);
 
     printf("tfsid inside: ");

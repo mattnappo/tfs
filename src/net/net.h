@@ -22,7 +22,8 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define RES_LEN 100000
+#define RES_LEN 1
+#define RES_BODY_LEN 
 
 // In bytes, not bits
 #define REQ_TYPE_O 0
@@ -37,24 +38,35 @@
 // };
 
 enum req_type {
-    TFS_GET_FS,
-    TFS_GET_FILE,
-    TFS_PUT_FILE,
-    TFS_NEW_FS,
-    TFS_GET_ALL_FSIDS,
-    TFS_MAX = 255
+    REQ_GET_FS,          /* get a filesystem by fsid */
+    REQ_GET_FILE,        /* get a singular file from fs given fsid */
+    REQ_PUT_FILE,        /* put a file into fs given fsid */
+    REQ_NEW_FS,          /* make a new fs */
+    REQ_GET_ALL_FSIDS,   /* get all fsids in the fsdb */
+    REQ_MAX = 255
 };
 
 struct tfs_req {
     // struct tfs_header header;
     enum req_type type;
     uint8_t fsid[FSID_LEN];
+    uint8_t filename;
 };
 
-// Could be an error
+enum res_type {
+    RES_ERROR,     /* an error,  data=error message */
+    RES_FILE,      /* a success, data=a file */
+    RES_FS,        /* a success, data=a filesystem */
+    RES_FSIDS,     /* a success, data=a list of fsids */
+    RES_SUCCESS,   /* a general success, data=a general message */
+    RES_MESG,      /* data=a general message */
+    RES_MAX = 255
+};
+
 struct tfs_res {
     // struct tfs_header header;
-
+    enum res_type type;
+    uint8_t data[RES_BODY_LEN];
 };
 
 /* protocol */

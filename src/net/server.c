@@ -96,7 +96,7 @@ static int handle_req(SOCKET client, struct tfs_req r)
     switch (r.type) {
     // TODO: Really, this will send a res (once I implemented ress)
     // instead of just the raw fs bytes
-    case TFS_GET_FS: {
+    case REQ_GET_FS: {
         struct lbuffer temp_fs = get_temp_fs();
         uint8_t *tfs_buf = temp_fs.buf;
         size_t tfs_len = temp_fs.len;
@@ -105,16 +105,16 @@ static int handle_req(SOCKET client, struct tfs_req r)
         free(tfs_buf);
         break;
     }
-    case TFS_GET_FILE:
+    case REQ_GET_FILE:
         break;
 
-    case TFS_PUT_FILE:
+    case REQ_PUT_FILE:
         break;
 
-    case TFS_NEW_FS:
+    case REQ_NEW_FS:
         break;
 
-    case TFS_GET_ALL_FSIDS:
+    case REQ_GET_ALL_FSIDS:
         break;
 
     default:

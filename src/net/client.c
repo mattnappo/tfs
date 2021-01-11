@@ -47,7 +47,7 @@ struct fs *client_get_fs(SOCKET server)
     // First, make the request to get an fs
     uint8_t tfsid[FSID_LEN];
     memset(tfsid, 0x00, FSID_LEN);
-    struct tfs_req req = { .type = TFS_GET_FS };
+    struct tfs_req req = { .type = REQ_GET_FS };
     memcpy(req.fsid, tfsid, FSID_LEN);
     uint8_t *packed;
     pack_req(&packed, req);

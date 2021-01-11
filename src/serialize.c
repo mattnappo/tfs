@@ -237,9 +237,13 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
 
     // Pack
     unsigned len = filesystem__get_packed_size(&sfs);
-    *buf = malloc(len);
-    filesystem__pack(&sfs, *buf);
-    printf("writing %d serialized bytes\n", len);
+    if (len < MAX_PACKED_FS_LEN) {
+        *buf = malloc(len);
+        filesystem__pack(&sfs, *buf);
+        printf("writing %d serialized bytes\n", len);
+    } else {
+        len = 0;
+    }
 
     // Free memory and ftable
     free(smem.bytes_.data);
