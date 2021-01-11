@@ -22,13 +22,14 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define REQ_SIZE 4096
 #define RES_SIZE 100000
 
+// In bytes, not bits
 #define REQ_TYPE_O 0
-#define REQ_TYPE_L 8
-#define REQ_FSID_O 9
+#define REQ_TYPE_L 1
+#define REQ_FSID_O 1
 #define REQ_FSID_L FSID_LEN
+#define REQ_SIZE (REQ_TYPE_L+REQ_FSID_L)
  
 // Add headers eventually
 // struct tfs_header {

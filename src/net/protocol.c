@@ -7,14 +7,11 @@
 
 size_t pack_req(uint8_t **buf, struct tfs_req req)
 {
+    *buf = calloc(REQ_SIZE, 1);
     int t = (int) req.type;
-    *buf = calloc(sizeof(struct tfs_req), 1);
-    memcpy(buf[0], (uint8_t *) &t, REQ_TYPE_L);
-    // memcpy(&buf[REQ_FSID_O],
-    //     req.fsid, REQ_FSID_L);
-
-    printf("size: %lu\n", sizeof(struct tfs_req));
-    printf("calculated size: %d\n", REQ_TYPE_L + REQ_FSID_L);
-    return sizeof(struct tfs_req);
-
+    memcpy(buf[REQ_TYPE_O], (uint8_t *) &t, REQ_TYPE_L);
+    memcpy(*buf+REQ_FSID_O, &req.fsid, REQ_FSID_L);
+    return REQ_SIZE;
 }
+
+
