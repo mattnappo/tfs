@@ -89,8 +89,8 @@ int init_server(char *port)
 int handle_conn(SOCKET client)
 {
     // Read request
-    uint8_t *request = calloc(REQ_SIZE, 1);
-    int reqlen = recv(client, request, REQ_SIZE, 0);
+    uint8_t *request = calloc(REQ_LEN, 1);
+    int reqlen = recv(client, request, REQ_LEN, 0);
     if (reqlen <= 0) {
         fprintf(stderr, "recv failed: %d\n", reqlen);
     }

@@ -1,9 +1,15 @@
 #include "net/net.h"
 
+void print_req(struct tfs_req r)
+{
+    printf("\nreq:\n  type: %d\n  fsid: 0x", r.type);
+    for (int c = 0; c < FSID_LEN; c++)
+        printf("%02x", r.fsid[c]);
+    printf("\n\n");
+}
+
 int test_res()
 {
-    // This is the process for making a request
-
     // Make the request
     uint8_t tfsid[FSID_LEN];
     memset(tfsid, 0x41, 16);
@@ -22,11 +28,15 @@ int test_res()
 
     // Pack it
     uint8_t *packed;
-    size_t packed_len = pack_req(&packed, req);
+    pack_req(&packed, req);
     printf("packed req: 0x");
-    for (int i = 0; i < packed_len; i++)
+    for (int i = 0; i < REQ_LEN; i++)
         printf("%02x ", packed[i]);
     printf("\n\n");
+
+    // Unpack it
+    struct tfs_req unpacked = unpack_req(packed);
+    print_req(unpacked);
 
     free(packed);
     return 0;

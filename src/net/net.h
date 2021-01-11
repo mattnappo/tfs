@@ -29,7 +29,7 @@
 #define REQ_TYPE_L 1
 #define REQ_FSID_O 1
 #define REQ_FSID_L FSID_LEN
-#define REQ_SIZE (REQ_TYPE_L+REQ_FSID_L)
+#define REQ_LEN (REQ_TYPE_L+REQ_FSID_L)
  
 // Add headers eventually
 // struct tfs_header {
@@ -55,10 +55,10 @@ struct tfs_res {
 };
 
 /* protocol */
-size_t pack_req(uint8_t **buf, struct tfs_req req);
-size_t pack_res(uint8_t **buf, struct tfs_res res);
-struct tfs_req unpack_req(uint8_t *req, size_t len);
-struct tfs_res unpack_res(uint8_t *res, size_t len);
+void pack_req(uint8_t **buf, struct tfs_req req);
+void pack_res(uint8_t **buf, struct tfs_res res);
+struct tfs_req unpack_req(uint8_t *req);
+struct tfs_res unpack_res(uint8_t *res);
 
 /* server */
 int init_server(char *port);
