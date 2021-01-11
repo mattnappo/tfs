@@ -59,6 +59,8 @@ void pack_req(uint8_t **buf, struct tfs_req req);
 void pack_res(uint8_t **buf, struct tfs_res res);
 struct tfs_req unpack_req(uint8_t *req);
 struct tfs_res unpack_res(uint8_t *res);
+void print_req(struct tfs_req r);
+void print_res(struct tfs_res r);
 
 /* server */
 int init_server(char *port);
