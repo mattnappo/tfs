@@ -22,6 +22,7 @@ static struct lbuffer get_temp_fs()
     destroy_file(tfile1);
     destroy_file(tfile2);
     destroy_file(tfile3);
+    destroy_fs(tfs);
     struct lbuffer lbuff = { .buf = buffer, .len = slen  };
     return lbuff;
 }
@@ -108,6 +109,12 @@ static int handle_req(SOCKET client, struct tfs_req r)
         break;
 
     case TFS_PUT_FILE:
+        break;
+
+    case TFS_NEW_FS:
+        break;
+
+    case TFS_GET_ALL_FSIDS:
         break;
 
     default:

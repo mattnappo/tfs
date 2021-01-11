@@ -32,7 +32,7 @@ void        fs_print_file  (struct fs *fs, char *name, int show_mem);
 void        destroy_fs     (struct fs *fs);
 
 /* front end file functions */
-void        print_file   (struct file f, enum print_mode as_hex);
+void        print_file   (struct file f, enum print_mode mode);
 struct file new_file     (const char *name);
 void        destroy_file (struct file f);
 

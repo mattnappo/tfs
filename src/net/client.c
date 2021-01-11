@@ -33,7 +33,8 @@ SOCKET init_client(char *ip, char *port)
     status = connect(server_sd,
         server_addr->ai_addr, server_addr->ai_addrlen);
     if (status != 0) {
-        fprintf(stderr, "conncet failed: %d\n", GETSOCKETERRNO());
+        fprintf(stderr, "connect failed: %d\n", GETSOCKETERRNO());
+        freeaddrinfo(server_addr);
         return -1;
     }
     freeaddrinfo(server_addr);
@@ -58,6 +59,7 @@ struct fs *client_get_fs(SOCKET server)
         print_req(req);
         return NULL;
     }
+    free(packed);
 
     // Finally, read from server and make fs
     uint8_t recv_fs_buffer[RES_LEN];

@@ -37,15 +37,15 @@ struct file new_file(const char *name)
 
 void destroy_file(struct file f) { free(f.bytes); }
 
-void print_file(struct file f, enum print_mode as_hex)
+void print_file(struct file f, enum print_mode mode)
 {
     printf("fs file:\n  name: %s\n  size: %ld\n  bytes: ", f.name, f.s);
-    if (as_hex) {
+    if (mode == HEX) {
         for (int i = 0; i < f.s; i++) {
             printf("%2x ", f.bytes[i]);
         }
         printf("\n");
-    } else {
+    } else if (mode == ASCII) {
         for (int i = 0; i < f.s; i++) {
             printf("%c", f.bytes[i]);
         }

@@ -40,6 +40,8 @@ enum req_type {
     TFS_GET_FS,
     TFS_GET_FILE,
     TFS_PUT_FILE,
+    TFS_NEW_FS,
+    TFS_GET_ALL_FSIDS,
     TFS_MAX = 255
 };
 
@@ -49,6 +51,7 @@ struct tfs_req {
     uint8_t fsid[FSID_LEN];
 };
 
+// Could be an error
 struct tfs_res {
     // struct tfs_header header;
 
