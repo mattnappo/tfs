@@ -52,49 +52,49 @@ void   file__free_unpacked
   assert(message->base.descriptor == &file__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   memory__init
-                     (Memory         *message)
+void   vdisk__init
+                     (VDisk         *message)
 {
-  static const Memory init_value = MEMORY__INIT;
+  static const VDisk init_value = VDISK__INIT;
   *message = init_value;
 }
-size_t memory__get_packed_size
-                     (const Memory *message)
+size_t vdisk__get_packed_size
+                     (const VDisk *message)
 {
-  assert(message->base.descriptor == &memory__descriptor);
+  assert(message->base.descriptor == &vdisk__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t memory__pack
-                     (const Memory *message,
+size_t vdisk__pack
+                     (const VDisk *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &memory__descriptor);
+  assert(message->base.descriptor == &vdisk__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t memory__pack_to_buffer
-                     (const Memory *message,
+size_t vdisk__pack_to_buffer
+                     (const VDisk *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &memory__descriptor);
+  assert(message->base.descriptor == &vdisk__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Memory *
-       memory__unpack
+VDisk *
+       vdisk__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Memory *)
-     protobuf_c_message_unpack (&memory__descriptor,
+  return (VDisk *)
+     protobuf_c_message_unpack (&vdisk__descriptor,
                                 allocator, len, data);
 }
-void   memory__free_unpacked
-                     (Memory *message,
+void   vdisk__free_unpacked
+                     (VDisk *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &memory__descriptor);
+  assert(message->base.descriptor == &vdisk__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   filetable_file__init
@@ -341,7 +341,7 @@ const ProtobufCMessageDescriptor file__descriptor =
   (ProtobufCMessageInit) file__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor memory__field_descriptors[1] =
+static const ProtobufCFieldDescriptor vdisk__field_descriptors[1] =
 {
   {
     "bytes_",
@@ -349,34 +349,34 @@ static const ProtobufCFieldDescriptor memory__field_descriptors[1] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof(Memory, bytes_),
+    offsetof(VDisk, bytes_),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned memory__field_indices_by_name[] = {
+static const unsigned vdisk__field_indices_by_name[] = {
   0,   /* field[0] = bytes_ */
 };
-static const ProtobufCIntRange memory__number_ranges[1 + 1] =
+static const ProtobufCIntRange vdisk__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 1 }
 };
-const ProtobufCMessageDescriptor memory__descriptor =
+const ProtobufCMessageDescriptor vdisk__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "Memory",
-  "Memory",
-  "Memory",
+  "VDisk",
+  "VDisk",
+  "VDisk",
   "",
-  sizeof(Memory),
+  sizeof(VDisk),
   1,
-  memory__field_descriptors,
-  memory__field_indices_by_name,
-  1,  memory__number_ranges,
-  (ProtobufCMessageInit) memory__init,
+  vdisk__field_descriptors,
+  vdisk__field_indices_by_name,
+  1,  vdisk__number_ranges,
+  (ProtobufCMessageInit) vdisk__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCFieldDescriptor filetable_file__field_descriptors[3] =
@@ -535,13 +535,13 @@ const ProtobufCMessageDescriptor filetable__descriptor =
 static const ProtobufCFieldDescriptor filesystem__field_descriptors[2] =
 {
   {
-    "mem",
+    "disk",
     1,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof(Filesystem, mem),
-    &memory__descriptor,
+    offsetof(Filesystem, disk),
+    &vdisk__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -560,8 +560,8 @@ static const ProtobufCFieldDescriptor filesystem__field_descriptors[2] =
   },
 };
 static const unsigned filesystem__field_indices_by_name[] = {
+  0,   /* field[0] = disk */
   1,   /* field[1] = ft */
-  0,   /* field[0] = mem */
 };
 static const ProtobufCIntRange filesystem__number_ranges[1 + 1] =
 {

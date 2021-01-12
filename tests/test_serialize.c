@@ -8,25 +8,25 @@ void get(struct ftable *ft, char name[])
     printf("name: %s\n  s: %zu\n  offset: %zu\n\n", test_get.name, test_get.s, test_get.offset);
 }
 
-void test_memory()
+void test_vdisk()
 {
-    // Make a memory
+    // Make a vdisk
     uint8_t *s = (uint8_t *)"test bytes\0";
 
-    struct memory *mem = new_memory();
-    mem_write(mem, s, 10, 0);
+    struct vdisk *vdisk = new_vdisk();
+    vdisk_write(vdisk, s, 10, 0);
 
     // Serialize
     uint8_t *serialized_buf;
     // Returns the length of the serialized bytes
-    unsigned len = serialize_memory(&serialized_buf, mem);
+    unsigned len = serialize_vdisk(&serialized_buf, vdisk);
 
-    // Deserialize into a new mem*
-    struct memory *d_mem = deserialize_memory(serialized_buf, len);
+    // Deserialize into a new vdisk*
+    struct vdisk *d_vdisk = deserialize_vdisk(serialized_buf, len);
 
-    mem_dump(d_mem, HEX, 2000);
-    destroy_memory(mem);
-    destroy_memory(d_mem);
+    vdisk_dump(d_vdisk, HEX, 2000);
+    destroy_vdisk(vdisk);
+    destroy_vdisk(d_vdisk);
 }
 
 void test_ftfile()
@@ -124,22 +124,22 @@ void test_ftable()
 void test_fs()
 {
     struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("testfile.txt");
-    struct file tfile2 = new_file("testfile2.txt");
-    struct file tfile3 = new_file("Makefile");
+    struct file tfile1 = new_file("files/testfile.txt");
+    struct file tfile2 = new_file("files/testfile2.txt");
+    struct file tfile3 = new_file("files/test_file");
 
     fs_add_file(tfs, tfile2, 0);
     fs_add_file(tfs, tfile1, 100);
     fs_add_file(tfs, tfile3, 200);
     fs_add_file(tfs, tfile3, 600);
 
-    mem_dump(tfs->mem, HEX, 2000);
+    vdisk_dump(tfs->disk, HEX, 2000);
     print_ftable(*tfs->ft);
 
-    get(tfs->ft, "filename");
-    get(tfs->ft, "testfile.txt");
-    get(tfs->ft, "testfile2.txt");
-    get(tfs->ft, "Makefile");
+    get(tfs->ft, "files/filename");
+    get(tfs->ft, "files/testfile.txt");
+    get(tfs->ft, "files/testfile2.txt");
+    get(tfs->ft, "files/test_file");
 
     // Serialize
     uint8_t *buffer;
@@ -147,13 +147,13 @@ void test_fs()
 
     // Deserialize
     struct fs *deserialized = deserialize_fs(buffer, slen);
-    mem_dump(deserialized->mem, HEX, 2000);
+    vdisk_dump(deserialized->disk, HEX, 2000);
     print_ftable(*deserialized->ft);
 
-    get(deserialized->ft, "filename");
-    get(deserialized->ft, "testfile.txt");
-    get(deserialized->ft, "testfile2.txt");
-    get(deserialized->ft, "Makefile");
+    get(deserialized->ft, "files/filename");
+    get(deserialized->ft, "files/testfile.txt");
+    get(deserialized->ft, "files/testfile2.txt");
+    get(deserialized->ft, "files/test_file");
     destroy_fs(deserialized);
 
     free(buffer);
@@ -167,9 +167,9 @@ void test_fs()
 void test_io()
 {
     struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("testfile.txt");
-    struct file tfile2 = new_file("testfile2.txt");
-    struct file tfile3 = new_file("Makefile");
+    struct file tfile1 = new_file("files/testfile.txt");
+    struct file tfile2 = new_file("files/testfile2.txt");
+    struct file tfile3 = new_file("files/test_file");
 
     fs_add_file(tfs, tfile1, 0);
     fs_add_file(tfs, tfile2, 100);
@@ -179,25 +179,25 @@ void test_io()
     destroy_file(tfile2);
     destroy_file(tfile3);
 
-    get(tfs->ft, "testfile.txt");
-    get(tfs->ft, "testfile2.txt");
-    get(tfs->ft, "Makefile");
+    get(tfs->ft, "files/testfile.txt");
+    get(tfs->ft, "files/testfile2.txt");
+    get(tfs->ft, "files/test_file");
 
-    int status = write_fs("test_fs.fs", tfs);
+    int status = write_fs("files/test_fs.fs", tfs);
     printf("fs write status: %d\n", status);
     destroy_fs(tfs);
 
-    struct fs *dfs2 = read_fs("test_fs.fs");
-    get(dfs2->ft, "testfile.txt");
-    get(dfs2->ft, "testfile2.txt");
-    get(dfs2->ft, "Makefile");
+    struct fs *dfs2 = read_fs("files/test_fs.fs");
+    get(dfs2->ft, "files/testfile.txt");
+    get(dfs2->ft, "files/testfile2.txt");
+    get(dfs2->ft, "files/test_file");
 
     destroy_fs(dfs2);
 }
 
 int main()
 {
-    test_memory();
+    test_vdisk();
     test_ftfile();
     test_ftbucket();
     test_ftable();

@@ -10,7 +10,7 @@ message File { // struct file
 
 /* actual types */
 
-message Memory { // struct memory
+message VDisk { // struct vdisk
     bytes bytes_ = 1;
 }
 
@@ -30,7 +30,7 @@ message Filetable { // struct ftable
 }
 
 message Filesystem { // struct fs
-    Memory mem = 1;
+    VDisk disk = 1;
     Filetable ft = 2;
 }
 

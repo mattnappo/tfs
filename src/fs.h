@@ -1,7 +1,7 @@
 #ifndef FS_H
 #define FS_H
 
-#include "memory.h"
+#include "vdisk.h"
 #include "ftable.h"
 #include "crypto.h"
 
@@ -20,7 +20,7 @@ struct file {
 
 // The main filesystem
 struct fs {
-    struct memory *mem;
+    struct vdisk *disk;
     struct ftable *ft;
     uint8_t id[FSID_LEN];
 };

@@ -16,7 +16,7 @@ PROTOBUF_C__BEGIN_DECLS
 
 
 typedef struct _File File;
-typedef struct _Memory Memory;
+typedef struct _VDisk VDisk;
 typedef struct _FiletableFile FiletableFile;
 typedef struct _FiletableBucket FiletableBucket;
 typedef struct _Filetable Filetable;
@@ -40,13 +40,13 @@ struct  _File
     , (char *)protobuf_c_empty_string, {0,NULL}, 0 }
 
 
-struct  _Memory
+struct  _VDisk
 {
   ProtobufCMessage base;
   ProtobufCBinaryData bytes_;
 };
-#define MEMORY__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&memory__descriptor) \
+#define VDISK__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&vdisk__descriptor) \
     , {0,NULL} }
 
 
@@ -88,7 +88,7 @@ struct  _Filetable
 struct  _Filesystem
 {
   ProtobufCMessage base;
-  Memory *mem;
+  VDisk *disk;
   Filetable *ft;
 };
 #define FILESYSTEM__INIT \
@@ -115,24 +115,24 @@ File *
 void   file__free_unpacked
                      (File *message,
                       ProtobufCAllocator *allocator);
-/* Memory methods */
-void   memory__init
-                     (Memory         *message);
-size_t memory__get_packed_size
-                     (const Memory   *message);
-size_t memory__pack
-                     (const Memory   *message,
+/* VDisk methods */
+void   vdisk__init
+                     (VDisk         *message);
+size_t vdisk__get_packed_size
+                     (const VDisk   *message);
+size_t vdisk__pack
+                     (const VDisk   *message,
                       uint8_t             *out);
-size_t memory__pack_to_buffer
-                     (const Memory   *message,
+size_t vdisk__pack_to_buffer
+                     (const VDisk   *message,
                       ProtobufCBuffer     *buffer);
-Memory *
-       memory__unpack
+VDisk *
+       vdisk__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   memory__free_unpacked
-                     (Memory *message,
+void   vdisk__free_unpacked
+                     (VDisk *message,
                       ProtobufCAllocator *allocator);
 /* FiletableFile methods */
 void   filetable_file__init
@@ -215,8 +215,8 @@ void   filesystem__free_unpacked
 typedef void (*File_Closure)
                  (const File *message,
                   void *closure_data);
-typedef void (*Memory_Closure)
-                 (const Memory *message,
+typedef void (*VDisk_Closure)
+                 (const VDisk *message,
                   void *closure_data);
 typedef void (*FiletableFile_Closure)
                  (const FiletableFile *message,
@@ -237,7 +237,7 @@ typedef void (*Filesystem_Closure)
 /* --- descriptors --- */
 
 extern const ProtobufCMessageDescriptor file__descriptor;
-extern const ProtobufCMessageDescriptor memory__descriptor;
+extern const ProtobufCMessageDescriptor vdisk__descriptor;
 extern const ProtobufCMessageDescriptor filetable_file__descriptor;
 extern const ProtobufCMessageDescriptor filetable_bucket__descriptor;
 extern const ProtobufCMessageDescriptor filetable__descriptor;

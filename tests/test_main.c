@@ -3,21 +3,20 @@
 void test_fs()
 {
 	struct fs *tfs = new_fs(); // Make the fs
-	struct file tfile = new_file("testfile.txt"); // Make a new file
-
+	struct file tfile = new_file("files/testfile.txt"); // Make a new file
+    
 	fs_add_file(tfs, tfile, 60); // Add the file to the fs
-	mem_dump(tfs->mem, HEX, 2000);
+	vdisk_dump(tfs->disk, HEX, 2000);
 	
-	// Test mem reading
-	uint8_t *some_read = mem_read(tfs->mem, 6, 62);
+	// Test vdisk reading
+	uint8_t *some_read = vdisk_read(tfs->disk, 6, 62);
 	printf("random read: ");
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++)
         printf("%2x ", some_read[i]);
-	}
 	printf("\n");
 
     // Get a file    
-	struct file file_read = fs_get_file(tfs, "testfile.txt");
+	struct file file_read = fs_get_file(tfs, "files/testfile.txt");
     print_file(file_read, HEX);
 
     free(some_read);
@@ -41,21 +40,21 @@ void get_fs_(struct fs *tfs, char fname[])
 void test_fs_simple()
 {
     struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("testfile.txt");
-    struct file tfile2 = new_file("testfile2.txt");
-    struct file tfile3 = new_file("Makefile");
+    struct file tfile1 = new_file("files/testfile.txt");
+    struct file tfile2 = new_file("files/testfile2.txt");
+    struct file tfile3 = new_file("files/test_file");
 
     fs_add_file(tfs, tfile2, 0);
     fs_add_file(tfs, tfile1, 100);
     fs_add_file(tfs, tfile3, 200);
     fs_add_file(tfs, tfile3, 600);
 
-    mem_dump(tfs->mem, HEX, 2000);
+    vdisk_dump(tfs->disk, HEX, 2000);
 
-    get_fs_(tfs, "filename");
-    get_fs_(tfs, "testfile.txt");
-    get_fs_(tfs, "testfile2.txt");
-    get_fs_(tfs, "Makefile");
+    get_fs_(tfs, "files/filename");
+    get_fs_(tfs, "files/testfile.txt");
+    get_fs_(tfs, "files/testfile2.txt");
+    get_fs_(tfs, "files/test_file");
 
     destroy_fs(tfs);
 
@@ -106,7 +105,7 @@ void test_ft()
 
 void test_invalid_filename()
 {
-    char *fname = "m";
+    char *fname = "files/m";
 	struct fs *tfs = new_fs(); // Make the fs
 	struct file broken = new_file(fname); // Make a new file
 
@@ -119,16 +118,11 @@ void test_invalid_filename()
     destroy_fs(tfs);
 }
 
-int test_mem()
-{
-	return 0;
-}
 
 int main()
 {
     test_fs();
     test_fs_simple();
-    test_mem();
     test_ft();
     test_invalid_filename();
 

@@ -5,35 +5,35 @@ typedef enum serialize_error_ {
     ERR_DESERIALIZE = 1
 } serialize_error;
 
-unsigned serialize_memory(uint8_t **buf, struct memory *mem)
+unsigned serialize_vdisk(uint8_t **buf, struct vdisk *disk)
 {
-    Memory mem_b = MEMORY__INIT;
-    mem_b.bytes_.data = malloc(mem->s);
-    mem_b.bytes_.len = mem->s;
-    memcpy(mem_b.bytes_.data, mem->bytes, mem->s);
-    unsigned len = memory__get_packed_size(&mem_b);
+    VDisk vdisk_b = VDISK__INIT;
+    vdisk_b.bytes_.data = malloc(disk->s);
+    vdisk_b.bytes_.len = disk->s;
+    memcpy(vdisk_b.bytes_.data, disk->bytes, disk->s);
+    unsigned len = vdisk__get_packed_size(&vdisk_b);
     *buf = malloc(len);
-    memory__pack(&mem_b, *buf);
+    vdisk__pack(&vdisk_b, *buf);
     printf("writing %d serialized bytes\n", len);
-    free(mem_b.bytes_.data);
+    free(vdisk_b.bytes_.data);
     return len;
 }
 
-struct memory *deserialize_memory(uint8_t *buf, unsigned len)
+struct vdisk *deserialize_vdisk(uint8_t *buf, unsigned len)
 {
-    Memory *mem_b = memory__unpack(NULL, len, buf);
-    if (mem_b == NULL) {
+    VDisk *vdisk_b = vdisk__unpack(NULL, len, buf);
+    if (vdisk_b == NULL) {
         printf("error unpacking bytes.\n");
         return NULL;
     }
 
-    struct memory *mem = new_memory();
-    memcpy(mem->bytes, mem_b->bytes_.data, mem_b->bytes_.len);
-    mem->s = mem_b->bytes_.len;
+    struct vdisk *vdisk = new_vdisk();
+    memcpy(vdisk->bytes, vdisk_b->bytes_.data, vdisk_b->bytes_.len);
+    vdisk->s = vdisk_b->bytes_.len;
      
-    memory__free_unpacked(mem_b, NULL);
+    vdisk__free_unpacked(vdisk_b, NULL);
     free(buf);
-    return mem;
+    return vdisk;
 }
 
 unsigned serialize_ftable_file(uint8_t **buf, struct ftable_file *file)
@@ -197,14 +197,14 @@ struct ftable *deserialize_ftable(uint8_t *buf, unsigned len)
 
 unsigned serialize_fs(uint8_t **buf, struct fs *fs)
 {
-    Filesystem sfs  = FILESYSTEM__INIT;
-    Memory     smem = MEMORY__INIT;
-    Filetable  sft  = FILETABLE__INIT;
+    Filesystem sfs   = FILESYSTEM__INIT;
+    VDisk      sdisk = VDISK__INIT;
+    Filetable  sft   = FILETABLE__INIT;
 
-    // Make the memory
-    smem.bytes_.data = malloc(fs->mem->s);
-    smem.bytes_.len = fs->mem->s;
-    memcpy(smem.bytes_.data, fs->mem->bytes, fs->mem->s);
+    // Make the vdisk
+    sdisk.bytes_.data = malloc(fs->disk->s);
+    sdisk.bytes_.len = fs->disk->s;
+    memcpy(sdisk.bytes_.data, fs->disk->bytes, fs->disk->s);
 
     // Make the ftable
     FiletableBucket **buckets;
@@ -233,7 +233,7 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
 
     // Set into final fs to be serialized
     sfs.ft = &sft;
-    sfs.mem = &smem;
+    sfs.disk = &sdisk;
 
     // Pack
     unsigned len = filesystem__get_packed_size(&sfs);
@@ -245,8 +245,8 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
         len = 0;
     }
 
-    // Free memory and ftable
-    free(smem.bytes_.data);
+    // Free vdisk and ftable
+    free(sdisk.bytes_.data);
     for (int j = 0; j < NUM_BUCKETS; j++) {
         for (int i = 0; i < buckets[j]->n_files; i++) {
             free(buckets[j]->files[i]->name);
@@ -269,8 +269,8 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
     }
 
     struct fs *dfs = malloc(sizeof(struct fs));
-    dfs->mem = new_memory();
-    memcpy(dfs->mem->bytes, fs->mem->bytes_.data, fs->mem->bytes_.len);
+    dfs->disk = new_vdisk();
+    memcpy(dfs->disk->bytes, fs->disk->bytes_.data, fs->disk->bytes_.len);
 
     dfs->ft = new_ftable();
 

@@ -5,6 +5,10 @@ struct file new_file(const char *name)
     struct file *f = malloc(sizeof(struct file));
     size_t fsize, read_size;
     FILE *fp = fopen(name, "r");
+    if (fp == NULL) {
+        printf("could not open file '%s'\n", name);
+        exit(1);
+    }
   
     if (fp) {
         fseek(fp, 0, SEEK_END);
@@ -40,7 +44,7 @@ int is_valid_filename(const char *name)
     if (strlen(name) >= FILENAME_SIZE) {
         return 0;
     }
-    const char invalid_chars[] = { '/' };
+    const char invalid_chars[] = { '\\' };
     for (int c = 0; c < sizeof(invalid_chars); c++) {
         if (strchr(name, invalid_chars[c]))
             return 0;
@@ -72,7 +76,7 @@ static void recalc_id(struct fs *fs);
 struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
-    fs->mem = new_memory();
+    fs->disk = new_vdisk();
     fs->ft  = new_ftable();
     memset(fs->id, 0, FSID_LEN);
     recalc_id(fs);
@@ -90,7 +94,7 @@ static void recalc_id(struct fs *fs)
 
 void destroy_fs(struct fs *fs)
 {
-    destroy_memory(fs->mem);
+    destroy_vdisk(fs->disk);
     destroy_ftable(fs->ft);
     free(fs);
 }
@@ -109,7 +113,7 @@ void fs_add_file(struct fs *fs, struct file f, size_t offset)
     if (status == -1)
         printf("'%s' is already in the fs.\n", f.name);
     else
-        mem_write(fs->mem, f.bytes, f.s, offset);
+        vdisk_write(fs->disk, f.bytes, f.s, offset);
 }
 
 int fs_remove_file();
@@ -121,15 +125,15 @@ struct file fs_get_file(struct fs *fs, char *name)
         printf("'%s' not in fs.\n", name);
         return (struct file) {};
     }
-    uint8_t *memory = mem_read(fs->mem, ftfile.s, ftfile.offset);
+    uint8_t *mem = vdisk_read(fs->disk, ftfile.s, ftfile.offset);
 
     struct file f;
     strcpy(f.name, ftfile.name);
     f.bytes = calloc(ftfile.s, 1);
-    memcpy(f.bytes, memory, ftfile.s);
+    memcpy(f.bytes, mem, ftfile.s);
     f.s = ftfile.s;
 
-    free(memory);
+    free(mem);
     return f;
 }
 

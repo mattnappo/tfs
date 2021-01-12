@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     }
 
     struct fs *fs = client_get_fs(server);
-    struct file f = fs_get_file(fs, "Makefile");
+    struct file f = fs_get_file(fs, "files/test_file");
     print_file(f, ASCII);
 
     destroy_fs(fs);

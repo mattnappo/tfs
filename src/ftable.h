@@ -8,7 +8,7 @@
 
 // A power of 2
 #define NUM_BUCKETS 16
-#define FILENAME_SIZE 16
+#define FILENAME_SIZE 32
 
 // An entry in an ftable bucket
 struct ftable_file {
