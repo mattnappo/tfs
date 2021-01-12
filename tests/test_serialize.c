@@ -21,9 +21,6 @@ void test_memory()
     // Returns the length of the serialized bytes
     unsigned len = serialize_memory(&serialized_buf, mem);
 
-    for (int u = 0; u < len; u++)
-        printf("%0x ", serialized_buf[u]);
-
     // Deserialize into a new mem*
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 

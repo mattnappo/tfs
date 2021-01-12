@@ -4,10 +4,8 @@ void test_fs()
 {
 	struct fs *tfs = new_fs(); // Make the fs
 	struct file tfile = new_file("testfile.txt"); // Make a new file
-	struct file broken_tfile = new_file("testfile.txt'"); // Make a new file
 
 	fs_add_file(tfs, tfile, 60); // Add the file to the fs
-	fs_add_file(tfs, broken_tfile, 0);
 	mem_dump(tfs->mem, HEX, 2000);
 	
 	// Test mem reading
@@ -108,7 +106,7 @@ void test_ft()
 
 void test_invalid_filename()
 {
-    const char *fname = "m";
+    char *fname = "m";
 	struct fs *tfs = new_fs(); // Make the fs
 	struct file broken = new_file(fname); // Make a new file
 
@@ -128,10 +126,10 @@ int test_mem()
 
 int main()
 {
-    //test_fs();
-    //test_fs_simple();
-    //test_mem();
-    //test_ft();
+    test_fs();
+    test_fs_simple();
+    test_mem();
+    test_ft();
     test_invalid_filename();
 
     return 0;

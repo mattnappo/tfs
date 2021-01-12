@@ -17,3 +17,5 @@ read -p "Press enter to continue"
 make test_protocol  && ./memtest.sh ./bin/tests/test_protocol.out
 echo protocol
 
+rm vgcore*
+
