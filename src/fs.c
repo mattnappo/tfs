@@ -35,25 +35,57 @@ struct file new_file(const char *name)
     return file;
 }
 
+int is_valid_filename(const char *name)
+{
+    if (strlen(name) >= FILENAME_SIZE) {
+        return 0;
+    }
+    const char invalid_chars[] = { '/' };
+    for (int c = 0; c < sizeof(invalid_chars); c++) {
+        if (strchr(name, invalid_chars[c]))
+            return 0;
+    }
+    return 1;
+}
+
 void destroy_file(struct file f) { free(f.bytes); }
 
-void print_file(struct file f)
+void print_file(struct file f, enum print_mode mode)
 {
     printf("fs file:\n  name: %s\n  size: %ld\n  bytes: ", f.name, f.s);
-
-    // TODO: make a temp memory and use dump here.
-    for (int i = 0; i < f.s; i++) {
-        printf("%2x ", f.bytes[i]);
+    if (f.s < 0) return;
+    if (mode == HEX) {
+        for (int i = 0; i < f.s; i++) {
+            printf("%2x ", f.bytes[i]);
+        }
+        printf("\n");
+    } else if (mode == ASCII) {
+        for (int i = 0; i < f.s; i++) {
+            printf("%c", f.bytes[i]);
+        }
+        printf("\n");
     }
-    printf("\n");
 }
+
+static void recalc_id(struct fs *fs);
 
 struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
     fs->mem = new_memory();
     fs->ft  = new_ftable();
+    memset(fs->id, 0, FSID_LEN);
+    recalc_id(fs);
     return fs;
+}
+
+static void recalc_id(struct fs *fs)
+{
+    uint8_t digest[FSID_LEN];
+    memset(digest, 0, FSID_LEN);
+    uint8_t t = time(NULL);
+    const uint8_t *key = (const uint8_t *) &t;
+    calc_md5(key, sizeof(key), digest);
 }
 
 void destroy_fs(struct fs *fs)
@@ -65,6 +97,14 @@ void destroy_fs(struct fs *fs)
 
 void fs_add_file(struct fs *fs, struct file f, size_t offset)
 {
+    if (f.s >= MAX_FILE_LEN) {
+        printf("file '%s' is too large (size %lu).\n", f.name, f.s);
+        return;
+    }
+    if (!is_valid_filename(f.name)) {
+        printf("file '%s' has an invalid name.\n", f.name);
+        return;
+    }
     int status = ftable_add_file(fs->ft, f.name, f.s, offset);
     if (status == -1)
         printf("'%s' is already in the fs.\n", f.name);

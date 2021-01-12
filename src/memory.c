@@ -14,10 +14,11 @@ void destroy_memory(struct memory *mem)
     free(mem);
 }
 
-int mem_dump(struct memory *mem, enum print_mode m)
+int mem_dump(struct memory *mem, enum print_mode m, int endpoint)
 {
+    if (endpoint >= mem->s) return 1;
     printf("\n=== BEGIN DUMP ===\n");
-    for (int i = 0; i < mem->s; i++) {
+    for (int i = 0; i < endpoint; i++) {
         if (mem->bytes[i] == 0)
             printf("%s", (m == HEX) ? "00 " : " ");
         else if (m == HEX)

@@ -21,13 +21,10 @@ void test_memory()
     // Returns the length of the serialized bytes
     unsigned len = serialize_memory(&serialized_buf, mem);
 
-    for (int u = 0; u < len; u++)
-        printf("%0x ", serialized_buf[u]);
-
     // Deserialize into a new mem*
     struct memory *d_mem = deserialize_memory(serialized_buf, len);
 
-    mem_dump(d_mem, HEX);
+    mem_dump(d_mem, HEX, 2000);
     destroy_memory(mem);
     destroy_memory(d_mem);
 }
@@ -136,7 +133,7 @@ void test_fs()
     fs_add_file(tfs, tfile3, 200);
     fs_add_file(tfs, tfile3, 600);
 
-    mem_dump(tfs->mem, HEX);
+    mem_dump(tfs->mem, HEX, 2000);
     print_ftable(*tfs->ft);
 
     get(tfs->ft, "filename");
@@ -150,7 +147,7 @@ void test_fs()
 
     // Deserialize
     struct fs *deserialized = deserialize_fs(buffer, slen);
-    mem_dump(deserialized->mem, HEX);
+    mem_dump(deserialized->mem, HEX, 2000);
     print_ftable(*deserialized->ft);
 
     get(deserialized->ft, "filename");

@@ -4,7 +4,7 @@ EXEC := $(BIN)/tfs.out
 MAIN := ./cli.c
 
 FLAGS   := -Wall -g
-LIBS    := -lm -L/usr/local/lib -lprotobuf-c
+LIBS    := -lm -L/usr/local/lib -lprotobuf-c -L/usr/lib -lcrypto
 INCLUDE := -I/usr/local/include
 
 SOURCES := $(shell find $(SRC) -name '*.c')
@@ -22,17 +22,23 @@ tfs: $(SOURCES) $(HEADERS) $(PROTO_HEADERS) $(MAIN)
 
 # ----- TESTS ----- #
 
-test:
-	make clean
-	make                && ./memtest.sh ./bin/tfs.out
-	make test_main      && ./memtest.sh ./bin/tests/test_main.out
-	make test_serialize && ./memtest.sh ./bin/tests/test_serialize.out
-
 test_main: ./tests/test_main.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
 test_serialize: ./tests/test_serialize.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
+test_server: ./tests/test_server.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
+test_client: ./tests/test_client.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
+	mkdir -p $(BIN)/tests/
+	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
+
+test_protocol: ./tests/test_protocol.c $(SOURCES) $(HEADERS) $(PROTO_HEADERS)
 	mkdir -p $(BIN)/tests/
 	gcc $(FLAGS) -o $(BIN)/tests/$@.out $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 

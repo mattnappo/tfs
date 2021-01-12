@@ -6,7 +6,7 @@ void test_fs()
 	struct file tfile = new_file("testfile.txt"); // Make a new file
 
 	fs_add_file(tfs, tfile, 60); // Add the file to the fs
-	mem_dump(tfs->mem, HEX);
+	mem_dump(tfs->mem, HEX, 2000);
 	
 	// Test mem reading
 	uint8_t *some_read = mem_read(tfs->mem, 6, 62);
@@ -18,7 +18,7 @@ void test_fs()
 
     // Get a file    
 	struct file file_read = fs_get_file(tfs, "testfile.txt");
-    print_file(file_read);
+    print_file(file_read, HEX);
 
     free(some_read);
     free(file_read.bytes);
@@ -30,7 +30,7 @@ void get_fs_(struct fs *tfs, char fname[])
 {
     printf("\n\n");
     struct file tread = fs_get_file(tfs, fname);
-    print_file(tread);
+    print_file(tread, HEX);
     for (int i = 0; i < tread.s; i++)
         printf("%c", tread.bytes[i]);
     printf("\n");
@@ -50,7 +50,7 @@ void test_fs_simple()
     fs_add_file(tfs, tfile3, 200);
     fs_add_file(tfs, tfile3, 600);
 
-    mem_dump(tfs->mem, HEX);
+    mem_dump(tfs->mem, HEX, 2000);
 
     get_fs_(tfs, "filename");
     get_fs_(tfs, "testfile.txt");
@@ -104,6 +104,21 @@ void test_ft()
 
 }
 
+void test_invalid_filename()
+{
+    char *fname = "m";
+	struct fs *tfs = new_fs(); // Make the fs
+	struct file broken = new_file(fname); // Make a new file
+
+	fs_add_file(tfs, broken, 0);
+    struct file fetched = fs_get_file(tfs, fname);
+    print_file(fetched, ASCII);
+    destroy_file(broken);
+    destroy_file(fetched);
+
+    destroy_fs(tfs);
+}
+
 int test_mem()
 {
 	return 0;
@@ -115,6 +130,7 @@ int main()
     test_fs_simple();
     test_mem();
     test_ft();
+    test_invalid_filename();
 
     return 0;
 }

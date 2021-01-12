@@ -7,8 +7,9 @@
 #include "proto/build/tfs.pb-c.h"
 #include "fs.h"
 
-#define MAX_MEM_SIZE MEM_SIZE+32
-#define MAX_IO_SIZE 100000
+#define MAX_PACKED_FILE_LEN (MAX_FILE_LEN+PROTO_PADDING)
+#define MAX_PACKED_FS_LEN   (MEM_SIZE+4096+(PROTO_PADDING*2))
+#define MAX_IO_SIZE         MAX_PACKED_FS_LEN
 
 /* serialize the given pointer into buf */
 unsigned serialize_memory        (uint8_t **buf, struct memory *mem);
