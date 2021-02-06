@@ -94,7 +94,7 @@ int init_server(char *port)
 static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
-    // TODO: Really, this will send a res (once I implemented ress)
+    // TODO: This will send a res
     // instead of just the raw fs bytes
     case REQ_GET_FS: {
         struct lbuffer temp_fs = get_temp_fs();

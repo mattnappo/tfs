@@ -63,6 +63,7 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
     uint8_t recv_fs_buffer[RES_LEN];
     int bytes_recv = recv(server, recv_fs_buffer, RES_LEN, 0);
     printf("recv %d bytes\n", bytes_recv);
+    // UNPACK HERE
     struct fs *dfs = deserialize_fs(recv_fs_buffer, bytes_recv); // Because its raw for now
     return dfs;
 }

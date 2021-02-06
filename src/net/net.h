@@ -22,21 +22,18 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define RES_LEN      1
-#define RES_BODY_LEN 10000
+#define RES_TYPE_OFF 0
+#define RES_TYPE_LEN 1
+#define RES_BODY_OFF 3
+#define RES_BODY_LEN MAX_PACKED_FS_LEN       /* max len */
+#define RES_LEN (RES_BODY_LEN+RES_TYPE_LEN)  /* max len */
 
-// In bytes (not bits)
-#define REQ_TYPE_O 0
-#define REQ_TYPE_L 1
-#define REQ_FSID_O 1
-#define REQ_FSID_L FSID_LEN
-#define REQ_LEN (REQ_TYPE_L+REQ_FSID_L)
+#define REQ_TYPE_OFF 0
+#define REQ_TYPE_LEN 1
+#define REQ_FSID_OFF 1
+#define REQ_FSID_LEN FSID_LEN
+#define REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN)
  
-// Add headers eventually
-// struct tfs_header {
-//     int i;
-// };
-
 enum req_type {
     REQ_GET_FS,          /* get a filesystem by fsid */
     REQ_GET_FILE,        /* get a singular file from fs given fsid */
@@ -47,7 +44,6 @@ enum req_type {
 };
 
 struct tfs_req {
-    // struct tfs_header header;
     enum req_type type;
     uint8_t fsid[FSID_LEN];
     uint8_t filename;
@@ -63,19 +59,19 @@ enum res_type {
     RES_MAX = 255
 };
 
-struct tfs_res { // TBI (TODO)
-    // struct tfs_header header;
+struct tfs_res {
     enum res_type type;
-    uint8_t data[RES_BODY_LEN];
+    uint16_t body_len;
+    uint8_t body[RES_BODY_LEN];
 };
 
 /* protocol */
-void pack_req(uint8_t **buf, struct tfs_req req);
-void pack_res(uint8_t **buf, struct tfs_res res);
+void   pack_req(uint8_t **buf, struct tfs_req req);
+size_t pack_res(uint8_t **buf, struct tfs_res res);
 struct tfs_req unpack_req(uint8_t *req);
 struct tfs_res unpack_res(uint8_t *res);
 void print_req(struct tfs_req r);
-void print_res(struct tfs_res r);
+void print_res(struct tfs_res r, int show_body);
 
 /* server */
 int init_server(char *port);
