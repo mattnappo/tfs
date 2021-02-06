@@ -33,6 +33,11 @@
 #define REQ_FSID_OFF 1
 #define REQ_FSID_LEN FSID_LEN
 #define REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN)
+
+enum net_err {
+    ERR_FS_OVERFLOW
+};
+int send_err(SOCKET client, enum net_err err);
  
 enum req_type {
     REQ_GET_FS,          /* get a filesystem by fsid */

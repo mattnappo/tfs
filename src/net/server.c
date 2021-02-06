@@ -94,14 +94,30 @@ int init_server(char *port)
 static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
-    // TODO: This will send a res
-    // instead of just the raw fs bytes
     case REQ_GET_FS: {
+        // Look up in fsdb (get random tmep fs for now)
         struct lbuffer temp_fs = get_temp_fs();
         uint8_t *tfs_buf = temp_fs.buf;
-        size_t tfs_len = temp_fs.len;
-        int reslen = send(client, (const void *) tfs_buf, tfs_len, 0);
-        printf("sent %d of %lu bytes.\n", reslen, tfs_len);
+        if (temp_fs.len >= RES_BODY_LEN) {
+            send_err(client, ERR_FS_OVERFLOW);
+            return -1;
+        }
+
+        // Make the res
+        struct tfs_res res = { .type = RES_FS, .body_len = temp_fs.len };
+        memcpy(res.body, tfs_buf, temp_fs.len);
+        print_res(res, 1);
+
+        // TEST - works
+        //struct fs *tdfs = deserialize_fs(res.body, res.body_len);
+        //fs_list_files(*tdfs);
+        //free(tdfs);
+
+        // Serialize and send
+        uint8_t *packed;
+        size_t reslen = pack_res(&packed, res);
+        int sent_reslen = send(client, (const void *) packed, reslen, 0);
+        printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
         free(tfs_buf);
         break;
     }
@@ -135,21 +151,11 @@ static int handle_conn(SOCKET client)
         return 1;
     }
     printf("received %d bytes.\n", reqlen);
-    printf("request: 0x");
-    for (int b = 0; b < REQ_LEN; b++)
-        printf("%02x", request[b]);
-    printf("\n");
 
     // Process the request
     int status;
     struct tfs_req unpacked_req = unpack_req(request);
-
-    printf("req type: %d\n req fsid: 0x", unpacked_req.type);
-    for (int b = 0; b < REQ_LEN; b++)
-        printf("%02x", unpacked_req.fsid[b]);
-    printf("\n");
-
-    print_req(unpacked_req); // working up to here
+    print_req(unpacked_req);
 
     status = handle_req(client, unpacked_req);
     if (status > 0) {

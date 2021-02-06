@@ -59,11 +59,27 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
     }
     free(packed);
 
-    // Read response from server and deserialize
-    uint8_t recv_fs_buffer[RES_LEN];
-    int bytes_recv = recv(server, recv_fs_buffer, RES_LEN, 0);
-    printf("recv %d bytes\n", bytes_recv);
-    // UNPACK HERE
-    struct fs *dfs = deserialize_fs(recv_fs_buffer, bytes_recv); // Because its raw for now
+    // Read response
+    uint8_t *raw_res = calloc(RES_LEN, 1);
+    int recv_reslen = recv(server, raw_res, RES_LEN, 0);
+    printf("received %d bytes.\n", recv_reslen);
+    struct tfs_res res = unpack_res(raw_res);
+    print_res(res, 0);
+
+    if (res.type == RES_ERROR) {
+        printf("%.*s", res.body_len, (char *)res.body);
+        return NULL;
+    }
+    if (res.type != RES_FS) {
+        printf("unknown response code %d\n", (int)res.type);
+        return NULL;
+    }
+
+    printf("\n");
+    for (int b=0;b<2120;b++)
+        printf("%02x", raw_res[b]);
+    printf("\n");
+
+    struct fs *dfs = deserialize_fs(res.body, res.body_len);
     return dfs;
 }

@@ -4,7 +4,7 @@
 // Knuth's number, as I like to call it
 #define A ((sqrt(5) - 1) / 2)
 
-// Hash function for a key k.
+// Hash function for a string key k.
 unsigned long fthash(char *k)
 {
     unsigned long key = to_radix(k);
