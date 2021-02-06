@@ -137,5 +137,10 @@ struct file fs_get_file(struct fs *fs, char *name)
     return f;
 }
 
+void fs_list_files(struct fs fs)
+{
+    print_ftable(*fs.ft);
+}
+
 void fs_print_file(struct fs *fs, char *name, int show_mem);
 
