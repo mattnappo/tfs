@@ -22,8 +22,8 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define RES_LEN 1
-#define RES_BODY_LEN 
+#define RES_LEN      10000
+#define RES_BODY_LEN 1
 
 // In bytes, not bits
 #define REQ_TYPE_O 0
@@ -63,7 +63,7 @@ enum res_type {
     RES_MAX = 255
 };
 
-struct tfs_res {
+struct tfs_res { // TBI (TODO)
     // struct tfs_header header;
     enum res_type type;
     uint8_t data[RES_BODY_LEN];
@@ -82,7 +82,7 @@ int init_server(char *port);
 
 /* client */
 SOCKET init_client(char *ip, char *port);
-struct fs *client_get_fs(SOCKET server);
+struct fs *client_get_fs(SOCKET server, uint8_t tfsid[]);
 int send_fs();
 int send_file();
 

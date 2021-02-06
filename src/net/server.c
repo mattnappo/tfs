@@ -11,9 +11,9 @@ static int handle_req(SOCKET client, struct tfs_req r);
 static struct lbuffer get_temp_fs()
 {
     struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("testfile.txt");
-    struct file tfile2 = new_file("testfile2.txt");
-    struct file tfile3 = new_file("Makefile");
+    struct file tfile1 = new_file("files/testfile.txt");
+    struct file tfile2 = new_file("files/testfile2.txt");
+    struct file tfile3 = new_file("files/test_file");
     fs_add_file(tfs, tfile1, 0);
     fs_add_file(tfs, tfile2, 50);
     fs_add_file(tfs, tfile3, 100);
@@ -130,16 +130,27 @@ static int handle_conn(SOCKET client)
     uint8_t *request = calloc(REQ_LEN, 1);
     int reqlen = recv(client, request, REQ_LEN, 0);
     if (reqlen != REQ_LEN) {
-        fprintf(stderr, "recv failed: %d. Did not recv all %d bytes. \n", reqlen, REQ_LEN);
+        fprintf(stderr, "recv failed: %d. Did not recv all %d bytes. \n",
+            reqlen, REQ_LEN);
         return 1;
     }
     printf("received %d bytes.\n", reqlen);
-    printf("%.*s", reqlen, request);
+    printf("request: 0x");
+    for (int b = 0; b < REQ_LEN; b++)
+        printf("%02x", request[b]);
+    printf("\n");
 
-    /* process the request */
+    // Process the request
     int status;
     struct tfs_req unpacked_req = unpack_req(request);
-    print_req(unpacked_req);
+
+    printf("req type: %d\n req fsid: 0x", unpacked_req.type);
+    for (int b = 0; b < REQ_LEN; b++)
+        printf("%02x", unpacked_req.fsid[b]);
+    printf("\n");
+
+    print_req(unpacked_req); // working up to here
+
     status = handle_req(client, unpacked_req);
     if (status > 0) {
         fprintf(stderr, "handle_req failed\n");

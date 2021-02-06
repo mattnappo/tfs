@@ -42,17 +42,15 @@ SOCKET init_client(char *ip, char *port)
     return server_sd;
 }
 
-struct fs *client_get_fs(SOCKET server)
+struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
 {
-    // First, make the request to get an fs
-    uint8_t tfsid[FSID_LEN];
-    memset(tfsid, 0x00, FSID_LEN);
+    // Construct request
     struct tfs_req req = { .type = REQ_GET_FS };
     memcpy(req.fsid, tfsid, FSID_LEN);
     uint8_t *packed;
     pack_req(&packed, req);
 
-    // Then, send it
+    // Send request
     int bytes_sent = send(server, packed, REQ_LEN, 0);
     if (bytes_sent != REQ_LEN) {
         fprintf(stderr, "send failed: did not send all req bytes\n");
@@ -61,7 +59,7 @@ struct fs *client_get_fs(SOCKET server)
     }
     free(packed);
 
-    // Finally, read from server and make fs
+    // Read response from server and deserialize
     uint8_t recv_fs_buffer[RES_LEN];
     int bytes_recv = recv(server, recv_fs_buffer, RES_LEN, 0);
     printf("recv %d bytes\n", bytes_recv);

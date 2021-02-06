@@ -1,5 +1,6 @@
 #include "net.h"
 
+// test these
 void print_req(struct tfs_req r)
 {
     printf("\nreq:\n  type: %d\n  fsid: 0x", r.type);

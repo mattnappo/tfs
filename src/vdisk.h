@@ -6,7 +6,8 @@
 #ifndef VDISK_H
 #define VDISK_H
 
-#define DISK_SIZE 5000000 // 5 MB
+//#define DISK_SIZE 5000000 // 5 MB
+#define DISK_SIZE 2000
 
 enum print_mode {
     HEX,
