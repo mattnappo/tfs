@@ -22,10 +22,10 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
-#define RES_LEN      10000
-#define RES_BODY_LEN 1
+#define RES_LEN      1
+#define RES_BODY_LEN 10000
 
-// In bytes, not bits
+// In bytes (not bits)
 #define REQ_TYPE_O 0
 #define REQ_TYPE_L 1
 #define REQ_FSID_O 1
