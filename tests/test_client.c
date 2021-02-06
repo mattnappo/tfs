@@ -22,6 +22,10 @@ int main(int argc, char *argv[])
     // memset(tfsid, 0x00, FSID_LEN);
 
     struct fs *fs = client_get_fs(server, tfsid);
+    if (fs == NULL) {
+        printf("client: received FS is null\n");
+        return 0;
+    }
     fs_list_files(*fs);
     struct file f = fs_get_file(fs, "files/test_file");
     print_file(f, ASCII);

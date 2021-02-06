@@ -99,6 +99,7 @@ static int handle_req(SOCKET client, struct tfs_req r)
         struct lbuffer temp_fs = get_temp_fs();
         uint8_t *tfs_buf = temp_fs.buf;
         if (temp_fs.len >= RES_BODY_LEN) {
+            free(tfs_buf);
             send_err(client, ERR_FS_OVERFLOW);
             return -1;
         }
@@ -106,12 +107,7 @@ static int handle_req(SOCKET client, struct tfs_req r)
         // Make the res
         struct tfs_res res = { .type = RES_FS, .body_len = temp_fs.len };
         memcpy(res.body, tfs_buf, temp_fs.len);
-        print_res(res, 1);
-
-        // TEST - works
-        //struct fs *tdfs = deserialize_fs(res.body, res.body_len);
-        //fs_list_files(*tdfs);
-        //free(tdfs);
+        print_res(res, 0);
 
         // Serialize and send
         uint8_t *packed;

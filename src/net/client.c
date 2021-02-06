@@ -67,19 +67,13 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
     print_res(res, 0);
 
     if (res.type == RES_ERROR) {
-        printf("%.*s", res.body_len, (char *)res.body);
+        printf("%s\n", (char *) res.body);
         return NULL;
     }
     if (res.type != RES_FS) {
         printf("unknown response code %d\n", (int)res.type);
         return NULL;
     }
-
-    printf("\n");
-    for (int b=0;b<2120;b++)
-        printf("%02x", raw_res[b]);
-    printf("\n");
-
     struct fs *dfs = deserialize_fs(res.body, res.body_len);
     return dfs;
 }

@@ -1,7 +1,7 @@
 #include "net.h"
 
 const char *emesgs[] = {
-    "server error: server fs is too large to send\n"
+    "server error: server fs is too large to send"
 };
 
 void print_req(struct tfs_req r)
@@ -36,7 +36,7 @@ void print_res(struct tfs_res r, int show_body)
     printf("\nres:\n  type: %d\n  body_len: %u\n",
         r.type, r.body_len);
     if (show_body) {
-        printf("  bytes:\n");
+        printf("  body: \n0x");
         for (int b = 0; b < r.body_len; b++)
             printf("%02x", r.body[b]);
         printf("\n");
@@ -63,7 +63,7 @@ struct tfs_res unpack_res(uint8_t *res)
     enum res_type type = res[RES_TYPE_OFF];
     uint16_t body_len = ((uint16_t) res[2] << 8) | res[1]; // little endian
     uint8_t *body = calloc(RES_BODY_LEN, 1);
-    memcpy(body, res+3, RES_BODY_LEN);
+    memcpy(body, res+RES_BODY_OFF, RES_BODY_LEN);
     struct tfs_res dres = { .type = type, .body_len = body_len };
     memcpy(dres.body, body, body_len);
     free(body);
@@ -74,9 +74,12 @@ int send_err(SOCKET client, enum net_err err)
 {
     uint8_t *body = (uint8_t *) emesgs[err];
     uint16_t body_len = strlen(emesgs[err]);
+    printf("error message len: %d\n", body_len);
     struct tfs_res res = { .type = RES_ERROR, .body_len = body_len };
     memcpy(res.body, body, body_len);
     uint8_t *packed;
-    pack_res(&packed, res);
-    return send(client, (const void *) packed, res.body_len, 0);
+    size_t reslen = pack_res(&packed, res);
+    int bytes_sent = send(client, (const void *) packed, reslen, 0);
+    printf("sending error (%d bytes)\n", bytes_sent);
+    return bytes_sent;
 }
