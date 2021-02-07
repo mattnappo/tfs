@@ -12,12 +12,21 @@ void print_req(struct tfs_req r)
     printf("\n\n");
 }
 
-void pack_req(uint8_t **buf, struct tfs_req req)
+size_t pack_req(uint8_t **buf, struct tfs_req req)
 {
     *buf = calloc(REQ_LEN, 1);
     int t = (int) req.type;
-    memcpy(buf[REQ_TYPE_OFF], (uint8_t *) &t, REQ_TYPE_LEN);
-    memcpy(*buf+REQ_FSID_OFF, &req.fsid, REQ_FSID_LEN);
+    memcpy(buf[REQ_TYPE_OFF], (uint8_t *) &t, REQ_TYPE_LEN); // copy type into 0
+    memcpy(*buf+REQ_FSID_OFF, &req.fsid, REQ_FSID_LEN); // copy fsid into [1,17]
+    memcpy(*buf+REQ_BODYLEN_OFF, (uint8_t *) &req.body_len, 2); // copy body_len into [18,19]
+    if (req.body_len >= REQ_BODY_LEN) {
+        printf("body is too large to pack request.\n");
+        return NULL;
+    }
+    if (req.body_len > 0) {
+        memcpy(*buf+REQ_BODY_OFF, res.body, res.body_len);
+    }
+    return REQ_TYPE_LEN+FSID_LEN+UINT16_LEN
 }
 
 struct tfs_req unpack_req(uint8_t *req)

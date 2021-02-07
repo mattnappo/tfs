@@ -22,17 +22,26 @@
 #define GETSOCKETERRNO() (errno)
 
 // #define LISTEN_PORT "8080"
+#define UINT16_LEN   2 /* for the uint16_t body_len */
+
 #define RES_TYPE_OFF 0
 #define RES_TYPE_LEN 1
+
+#define RES_BODYLEN_OFF 1
 #define RES_BODY_OFF 3
-#define RES_BODY_LEN MAX_PACKED_FS_LEN       /* max len */
-#define RES_LEN (RES_BODY_LEN+RES_TYPE_LEN)  /* max len */
+#define MAX_RES_BODY_LEN MAX_PACKED_FS_LEN                  /* max len */
+#define MAX_RES_LEN (RES_TYPE_LEN+UINT16_LEN+RES_BODY_LEN)  /* max len */
+/*               type         body_len   body       */
 
 #define REQ_TYPE_OFF 0
 #define REQ_TYPE_LEN 1
 #define REQ_FSID_OFF 1
 #define REQ_FSID_LEN FSID_LEN
-#define REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN)
+#define REQ_BODYLEN_OFF 17 /* len is 2 */
+#define REQ_BODY_OFF 19
+#define MAX_REQ_BODY_LEN MAX_FILE_LEN
+#define MAX_REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN+UINT16_LEN+REQ_BODY_LEN) /* max len */
+/*               type         fsid         body_len   body       */
 
 enum net_err {
     ERR_FS_OVERFLOW
@@ -40,27 +49,28 @@ enum net_err {
 int send_err(SOCKET client, enum net_err err);
  
 enum req_type {
-    REQ_GET_FS,          /* get a filesystem by fsid */
-    REQ_GET_FILE,        /* get a singular file from fs given fsid */
-    REQ_PUT_FILE,        /* put a file into fs given fsid */
-    REQ_NEW_FS,          /* make a new fs */
-    REQ_GET_ALL_FSIDS,   /* get all fsids in the fsdb */
+    REQ_GET_FS,          /* get fs by fsid,   body=null */
+    REQ_GET_FILE,        /* get file,         body=filename */
+    REQ_PUT_FILE,        /* put file into fs, body=file bytes */
+    REQ_NEW_FS,          /* make a new fs,    body=null */
+    REQ_GET_ALL_FSIDS,   /* get all fsids in fsdb, body=null*/
     REQ_MAX = 255
 };
 
 struct tfs_req {
     enum req_type type;
     uint8_t fsid[FSID_LEN];
-    uint8_t filename;
+    uint16_t body_len;
+    uint8_t body[REQ_BODY_LEN];
 };
 
 enum res_type {
-    RES_ERROR,     /* an error,  data=error message */
-    RES_FILE,      /* a success, data=a file */
-    RES_FS,        /* a success, data=a filesystem */
-    RES_FSIDS,     /* a success, data=a list of fsids */
-    RES_SUCCESS,   /* a general success, data=a general message */
-    RES_MESG,      /* data=a general message */
+    RES_ERROR,     /* an error,  body=error message */
+    RES_FILE,      /* a success, body=a file */
+    RES_FS,        /* a success, body=a filesystem */
+    RES_FSIDS,     /* a success, body=a list of fsids */
+    RES_SUCCESS,   /* a general success, body=a general message */
+    RES_MESG,      /* body=a general message */
     RES_MAX = 255
 };
 

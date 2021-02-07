@@ -9,7 +9,7 @@
 
 #define FSID_LEN HASH_LEN
 #define PROTO_PADDING 128
-#define MAX_FILE_LEN (50000-PROTO_PADDING) // 50 KB
+#define MAX_FILE_LEN (5000-PROTO_PADDING) // 5 KB
 
 // A frontend, end-user-ready file. struct fs does not contain this.
 struct file {

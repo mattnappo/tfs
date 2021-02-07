@@ -94,7 +94,7 @@ int init_server(char *port)
     return 0;
 }
 
-static int handle_req_get_fs(SOCKET client)
+static int handle_req_get_fs(SOCKET client, struct tfs_req r)
 {
     // Look up in fsdb (get random tmep fs for now)
     struct lbuffer temp_fs = get_temp_fs();
@@ -119,14 +119,22 @@ static int handle_req_get_fs(SOCKET client)
     return 0;
 }
 
+static int handle_req_get_file(SOCKET client, struct tfs_req r)
+{
+
+
+    return 0;
+}
+
 static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
     case REQ_GET_FS:
-        handle_req_get_fs(client);
+        handle_req_get_fs(client, r);
         break;
 
     case REQ_GET_FILE:
+        handle_req_get_file(client, r);
         break;
 
     case REQ_PUT_FILE:
