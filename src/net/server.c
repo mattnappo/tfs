@@ -94,7 +94,7 @@ int init_server(char *port)
     return 0;
 }
 
-static int handle_req_get_fs(SOCKET client, struct tfs_req r)
+static int handle_req_get_fs(SOCKET client)
 {
     // Look up in fsdb (get random tmep fs for now)
     struct lbuffer temp_fs = get_temp_fs();
@@ -116,15 +116,16 @@ static int handle_req_get_fs(SOCKET client, struct tfs_req r)
     int sent_reslen = send(client, (const void *) packed, reslen, 0);
     printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
     free(tfs_buf);
+    return 0;
 }
 
 static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
-    case REQ_GET_FS: {
-        handle_req_get_fs(client, r);
+    case REQ_GET_FS:
+        handle_req_get_fs(client);
         break;
-    }
+
     case REQ_GET_FILE:
         break;
 
