@@ -1,8 +1,7 @@
 # Some random notes
 
 # Currently:
-1. Make the server send actual responses, not just the raw fs bytes
-2. Allow for multiple FSs
+1. Allow for multiple FSs
  - Server will create a folder on disk called fsdb/
  - It will contain all filesystems on it
  - Will use the FSID in the req to lookup the right fs

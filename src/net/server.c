@@ -57,64 +57,72 @@ int init_server(char *port)
     freeaddrinfo(bind_addr);
 
     // Listen
-    status = listen(sd, 10);
-    if (status < 0) {
-        fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
-        return 1;
-    }
+    int backlog = 10;
+    while (1) {
+        status = listen(sd, backlog);
+        if (status < 0) {
+            fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
+            return 1;
+        }
 
-    // Accept client
-    struct sockaddr_storage client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    SOCKET client_sd = accept(sd,
-        (struct sockaddr *) &client_addr, &client_len);
-    if (!ISVALIDSOCKET(client_sd)) {
-        fprintf(stderr, "accept failed: %d\n", GETSOCKETERRNO());
-        return 1;
-    }
-    char addr_buffer[100];
-    getnameinfo((struct sockaddr *) &client_addr,
-        client_len, addr_buffer, sizeof(addr_buffer), 0, 0, NI_NUMERICHOST);
-    printf("%s\n", addr_buffer);
+        // Accept client
+        struct sockaddr_storage client_addr;
+        socklen_t client_len = sizeof(client_addr);
+        SOCKET client_sd = accept(sd,
+            (struct sockaddr *) &client_addr, &client_len);
+        if (!ISVALIDSOCKET(client_sd)) {
+            fprintf(stderr, "accept failed: %d\n", GETSOCKETERRNO());
+            return 1;
+        }
+        char addr_buffer[100];
+        getnameinfo((struct sockaddr *) &client_addr,
+            client_len, addr_buffer, sizeof(addr_buffer), 0, 0, NI_NUMERICHOST);
+        printf("%s\n", addr_buffer);
 
-    // Handle the connection
-    status = handle_conn(client_sd);
-    if (status != 0) {
-        fprintf(stderr, "handle_conn failed: %d\n", status);
-        return 1;
-    }
+        // Handle the connection
+        status = handle_conn(client_sd);
+        if (status != 0) {
+            fprintf(stderr, "handle_conn failed: %d\n", status);
+            return 1;
+        }
 
-    // Cleanup
-    CLOSESOCKET(client_sd);
+        // Cleanup
+        CLOSESOCKET(client_sd);
+    }
     CLOSESOCKET(sd);
 
     return 0;
+}
+
+static int handle_req_get_fs(SOCKET client, struct tfs_req r)
+{
+    // Look up in fsdb (get random tmep fs for now)
+    struct lbuffer temp_fs = get_temp_fs();
+    uint8_t *tfs_buf = temp_fs.buf;
+    if (temp_fs.len >= RES_BODY_LEN) {
+        free(tfs_buf);
+        send_err(client, ERR_FS_OVERFLOW);
+        return -1;
+    }
+
+    // Make the res
+    struct tfs_res res = { .type = RES_FS, .body_len = temp_fs.len };
+    memcpy(res.body, tfs_buf, temp_fs.len);
+    print_res(res, 0);
+
+    // Serialize and send
+    uint8_t *packed;
+    size_t reslen = pack_res(&packed, res);
+    int sent_reslen = send(client, (const void *) packed, reslen, 0);
+    printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
+    free(tfs_buf);
 }
 
 static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
     case REQ_GET_FS: {
-        // Look up in fsdb (get random tmep fs for now)
-        struct lbuffer temp_fs = get_temp_fs();
-        uint8_t *tfs_buf = temp_fs.buf;
-        if (temp_fs.len >= RES_BODY_LEN) {
-            free(tfs_buf);
-            send_err(client, ERR_FS_OVERFLOW);
-            return -1;
-        }
-
-        // Make the res
-        struct tfs_res res = { .type = RES_FS, .body_len = temp_fs.len };
-        memcpy(res.body, tfs_buf, temp_fs.len);
-        print_res(res, 0);
-
-        // Serialize and send
-        uint8_t *packed;
-        size_t reslen = pack_res(&packed, res);
-        int sent_reslen = send(client, (const void *) packed, reslen, 0);
-        printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
-        free(tfs_buf);
+        handle_req_get_fs(client, r);
         break;
     }
     case REQ_GET_FILE:
