@@ -22,7 +22,8 @@ void print_req(struct tfs_req r, int show_body)
 
 size_t pack_req(uint8_t **buf, struct tfs_req req)
 {
-    *buf = calloc(MAX_REQ_LEN, 1);
+    size_t req_len = REQ_TYPE_LEN+FSID_LEN+UINT16_LEN+req.body_len;
+    *buf = calloc(req_len, 1);
     int t = (int) req.type;
     memcpy(buf[REQ_TYPE_OFF], (uint8_t *) &t, REQ_TYPE_LEN); // copy type into 0
     memcpy(*buf+REQ_FSID_OFF, &req.fsid, REQ_FSID_LEN); // copy fsid into [1,16]
@@ -35,16 +36,23 @@ size_t pack_req(uint8_t **buf, struct tfs_req req)
         // copy body into [19,...]
         memcpy(*buf+REQ_BODY_OFF, req.body, req.body_len);
     }
-    return REQ_TYPE_LEN+FSID_LEN+UINT16_LEN+req.body_len;
+    return req_len;
 }
 
 struct tfs_req unpack_req(uint8_t *req)
 {
-    enum req_type type = req[REQ_TYPE_OFF];
+    enum req_type type = req[REQ_TYPE_OFF]; // extract type
+
     uint8_t *fsid = malloc(FSID_LEN);
-    memcpy(fsid, req+1, FSID_LEN);
-    struct tfs_req dreq = { .type = type };
+    memcpy(fsid, req+REQ_FSID_OFF, FSID_LEN); // extract fsid
+
+    uint16_t body_len = ((uint16_t) req[REQ_BODYLEN_OFF+1] << 8)
+        | req[REQ_BODYLEN_OFF]; // little endian
+
+    struct tfs_req dreq = { .type = type, .body_len = body_len };
     memcpy(dreq.fsid, fsid, FSID_LEN);
+    if (body_len > 0)
+        memcpy(dreq.body, req+REQ_BODY_OFF, body_len);
     free(fsid);
     return dreq;
 }
@@ -65,26 +73,24 @@ void print_res(struct tfs_res r, int show_body)
 size_t pack_res(uint8_t **buf, struct tfs_res res)
 {
     if (res.body_len >= MAX_RES_BODY_LEN) {
-        printf("error unpacking request: body len too long.");
+        printf("error packing request: req body is too big");
         return 0;
     }
-    *buf = calloc(MAX_RES_LEN, 1);
+    size_t res_len = RES_TYPE_LEN+UINT16_LEN+res.body_len;
+    *buf = calloc(res_len, 1);
     int t = (int) res.type;
     memcpy(buf[RES_TYPE_OFF], (uint8_t *) &t, RES_TYPE_LEN);
-    memcpy(*buf+1, (uint8_t *) &res.body_len, 2);
+    memcpy(*buf+1, (uint8_t *) &res.body_len, UINT16_LEN);
     memcpy(*buf+RES_BODY_OFF, res.body, res.body_len);
-    return 1+2 + res.body_len;
+    return res_len;
 }
 
 struct tfs_res unpack_res(uint8_t *res)
 {
-    enum res_type type = res[RES_TYPE_OFF];
+    enum res_type type = res[RES_TYPE_OFF]; // extract type
     uint16_t body_len = ((uint16_t) res[2] << 8) | res[1]; // little endian
-    uint8_t *body = calloc(MAX_RES_BODY_LEN, 1);
-    memcpy(body, res+RES_BODY_OFF, body_len);
     struct tfs_res dres = { .type = type, .body_len = body_len };
-    memcpy(dres.body, body, body_len);
-    free(body);
+    memcpy(dres.body, res+RES_BODY_OFF, body_len);
     return dres;
 }
 

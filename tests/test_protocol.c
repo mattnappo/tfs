@@ -2,7 +2,7 @@
 
 int test_req()
 {
-    // Make the request
+    // Make fsid
     uint8_t tfsid[FSID_LEN];
     memset(tfsid, 0x41, 16);
     printf("tfsid before: ");
@@ -10,13 +10,16 @@ int test_req()
         printf("%x ", tfsid[c]);
     printf("\n");
 
-    struct tfs_req req = { .type = REQ_PUT_FILE, .body_len = 0 };
-    memcpy(req.fsid, tfsid, FSID_LEN);
+    // Make body
+    size_t body_len = 30;
+    uint8_t *body = malloc(body_len);
+    memset(body, 0x07, body_len);
 
-    printf("tfsid inside: ");
-    for (int c = 0; c < 16; c++)
-        printf("%x ", req.fsid[c]);
-    printf("\n\n\n");
+    // Make res
+    struct tfs_req req = { .type = REQ_PUT_FILE, .body_len = body_len };
+    memcpy(req.fsid, tfsid, FSID_LEN); // copy fsid
+    memcpy(req.body, body, body_len); // copy body
+    free(body);
 
     // Pack it
     uint8_t *packed;
@@ -28,7 +31,10 @@ int test_req()
 
     // Unpack it
     struct tfs_req unpacked = unpack_req(packed);
-    print_req(unpacked);
+    print_req(unpacked, 1);
+    for (int i = 0; i < unpacked.body_len; i++)
+        printf("%02x ", unpacked.body[i]);
+    printf("\n");
 
     free(packed);
     return 0;
@@ -37,22 +43,22 @@ int test_req()
 int test_res()
 {
     // Make the res
-    uint8_t body[MAX_RES_BODY_LEN];
-    memset(body, 0x41, 3200);
-    struct tfs_res res = { .type = RES_MESG, .body_len = 3200 };
-    memcpy(res.body, body, 3200);
+    uint8_t body[100];
+    memset(body, 0x41, 100);
+    struct tfs_res res = { .type = RES_MESG, .body_len = 100 };
+    memcpy(res.body, body, 100);
     print_res(res, 0);
 
     // Serialize
     uint8_t *packed;
-    pack_res(&packed, res);
-    for (int i = 0; i < MAX_RES_LEN; i++)
+    size_t packed_len = pack_res(&packed, res);
+    for (int i = 0; i < packed_len; i++)
         printf("%02x ", packed[i]);
     printf("\n\n");
 
     // Deserialize
     struct tfs_res unpacked = unpack_res(packed);
-    print_res(unpacked, 0);
+    print_res(unpacked, 1);
 
     free(packed);
     return 0;
@@ -64,7 +70,7 @@ int main()
     status = test_req();
     printf("status: %d\n", status);
 
-    //status = test_res();
+    status = test_res();
     printf("status: %d\n", status);
 
     return status;
