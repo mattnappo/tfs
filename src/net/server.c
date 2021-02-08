@@ -27,7 +27,7 @@ static struct lbuffer get_temp_fs()
     return lbuff;
 }
 
-int init_server(char *port)
+int start_server(char *port)
 {
     // Create server socket sd
     struct addrinfo hints;
@@ -99,7 +99,7 @@ static int handle_req_get_fs(SOCKET client, struct tfs_req r)
     // Look up in fsdb (get random tmep fs for now)
     struct lbuffer temp_fs = get_temp_fs();
     uint8_t *tfs_buf = temp_fs.buf;
-    if (temp_fs.len >= RES_BODY_LEN) {
+    if (temp_fs.len >= MAX_RES_BODY_LEN) {
         free(tfs_buf);
         send_err(client, ERR_FS_OVERFLOW);
         return -1;
@@ -116,6 +116,7 @@ static int handle_req_get_fs(SOCKET client, struct tfs_req r)
     int sent_reslen = send(client, (const void *) packed, reslen, 0);
     printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
     free(tfs_buf);
+    free(packed);
     return 0;
 }
 
@@ -156,11 +157,13 @@ static int handle_req(SOCKET client, struct tfs_req r)
 static int handle_conn(SOCKET client)
 {
     // Read request
-    uint8_t *request = calloc(REQ_LEN, 1);
-    int reqlen = recv(client, request, REQ_LEN, 0);
-    if (reqlen != REQ_LEN) {
-        fprintf(stderr, "recv failed: %d. Did not recv all %d bytes. \n",
-            reqlen, REQ_LEN);
+    uint8_t *request = calloc(MAX_REQ_LEN, 1);
+    int reqlen = recv(client, request, MAX_REQ_LEN, 0);
+    if (reqlen < MIN_REQ_LEN || reqlen >= MAX_REQ_LEN) {
+        fprintf(stderr, "recv failed, received %d bytes (%d MIN, %d MAX).\n",
+            reqlen, MIN_REQ_LEN, MAX_REQ_LEN);
+        send_err(client, ERR_REQUEST_FAIL);
+        free(request);
         return 1;
     }
     printf("received %d bytes.\n", reqlen);
@@ -168,11 +171,13 @@ static int handle_conn(SOCKET client)
     // Process the request
     int status;
     struct tfs_req unpacked_req = unpack_req(request);
-    print_req(unpacked_req);
+    print_req(unpacked_req, 1);
 
     status = handle_req(client, unpacked_req);
     if (status > 0) {
-        fprintf(stderr, "handle_req failed\n");
+        send_err(client, ERR_REQUEST_FAIL);
+        free(request);
+        return 1;
     }
     free(request);
 

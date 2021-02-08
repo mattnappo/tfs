@@ -1,32 +1,41 @@
 #include "net.h"
 
 const char *emesgs[] = {
-    "server error: server fs is too large to send"
+    "server error: server fs is too large to send",
+    "server error: server unable to process request"
 };
 
-void print_req(struct tfs_req r)
+void print_req(struct tfs_req r, int show_body)
 {
     printf("\nreq:\n  type: %d\n  fsid: 0x", r.type);
-    for (int c = 0; c < FSID_LEN; c++)
-        printf("%02x", r.fsid[c]);
+    for (int i = 0; i < FSID_LEN; i++)
+        printf("%02x", r.fsid[i]);
+    printf("\n  body_len: %u\n", r.body_len);
+
+    if (show_body) {
+        printf("  body:\n");
+        for (int b = 0; b < r.body_len; b++)
+            printf("%02x ", r.body[b]);
+    }
     printf("\n\n");
 }
 
 size_t pack_req(uint8_t **buf, struct tfs_req req)
 {
-    *buf = calloc(REQ_LEN, 1);
+    *buf = calloc(MAX_REQ_LEN, 1);
     int t = (int) req.type;
     memcpy(buf[REQ_TYPE_OFF], (uint8_t *) &t, REQ_TYPE_LEN); // copy type into 0
-    memcpy(*buf+REQ_FSID_OFF, &req.fsid, REQ_FSID_LEN); // copy fsid into [1,17]
-    memcpy(*buf+REQ_BODYLEN_OFF, (uint8_t *) &req.body_len, 2); // copy body_len into [18,19]
-    if (req.body_len >= REQ_BODY_LEN) {
+    memcpy(*buf+REQ_FSID_OFF, &req.fsid, REQ_FSID_LEN); // copy fsid into [1,16]
+    memcpy(*buf+REQ_BODYLEN_OFF, (uint8_t *) &req.body_len, UINT16_LEN); // copy body_len into [17,18]
+    if (req.body_len >= MAX_REQ_BODY_LEN) {
         printf("body is too large to pack request.\n");
-        return NULL;
+        return 0;
     }
     if (req.body_len > 0) {
-        memcpy(*buf+REQ_BODY_OFF, res.body, res.body_len);
+        // copy body into [19,...]
+        memcpy(*buf+REQ_BODY_OFF, req.body, req.body_len);
     }
-    return REQ_TYPE_LEN+FSID_LEN+UINT16_LEN
+    return REQ_TYPE_LEN+FSID_LEN+UINT16_LEN+req.body_len;
 }
 
 struct tfs_req unpack_req(uint8_t *req)
@@ -55,11 +64,11 @@ void print_res(struct tfs_res r, int show_body)
 
 size_t pack_res(uint8_t **buf, struct tfs_res res)
 {
-    if (res.body_len >= RES_BODY_LEN) {
+    if (res.body_len >= MAX_RES_BODY_LEN) {
         printf("error unpacking request: body len too long.");
         return 0;
     }
-    *buf = calloc(RES_LEN, 1);
+    *buf = calloc(MAX_RES_LEN, 1);
     int t = (int) res.type;
     memcpy(buf[RES_TYPE_OFF], (uint8_t *) &t, RES_TYPE_LEN);
     memcpy(*buf+1, (uint8_t *) &res.body_len, 2);
@@ -71,8 +80,8 @@ struct tfs_res unpack_res(uint8_t *res)
 {
     enum res_type type = res[RES_TYPE_OFF];
     uint16_t body_len = ((uint16_t) res[2] << 8) | res[1]; // little endian
-    uint8_t *body = calloc(RES_BODY_LEN, 1);
-    memcpy(body, res+RES_BODY_OFF, RES_BODY_LEN);
+    uint8_t *body = calloc(MAX_RES_BODY_LEN, 1);
+    memcpy(body, res+RES_BODY_OFF, body_len);
     struct tfs_res dres = { .type = type, .body_len = body_len };
     memcpy(dres.body, body, body_len);
     free(body);

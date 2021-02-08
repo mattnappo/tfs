@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     }
 
     int status;
-    status = init_server(argv[1]);
+    status = start_server(argv[1]);
 
     return status;
 }

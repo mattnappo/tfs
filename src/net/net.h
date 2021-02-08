@@ -26,12 +26,11 @@
 
 #define RES_TYPE_OFF 0
 #define RES_TYPE_LEN 1
-
 #define RES_BODYLEN_OFF 1
 #define RES_BODY_OFF 3
-#define MAX_RES_BODY_LEN MAX_PACKED_FS_LEN                  /* max len */
-#define MAX_RES_LEN (RES_TYPE_LEN+UINT16_LEN+RES_BODY_LEN)  /* max len */
-/*               type         body_len   body       */
+#define MAX_RES_BODY_LEN MAX_PACKED_FS_LEN
+#define MAX_RES_LEN (RES_TYPE_LEN+UINT16_LEN+MAX_RES_BODY_LEN)
+/*                   type         body_len   body       */
 
 #define REQ_TYPE_OFF 0
 #define REQ_TYPE_LEN 1
@@ -40,11 +39,13 @@
 #define REQ_BODYLEN_OFF 17 /* len is 2 */
 #define REQ_BODY_OFF 19
 #define MAX_REQ_BODY_LEN MAX_FILE_LEN
-#define MAX_REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN+UINT16_LEN+REQ_BODY_LEN) /* max len */
-/*               type         fsid         body_len   body       */
+#define MAX_REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN+UINT16_LEN+MAX_REQ_BODY_LEN)
+/*                   type         fsid         body_len   body       */
+#define MIN_REQ_LEN (REQ_TYPE_LEN+REQ_FSID_LEN+UINT16_LEN)
 
 enum net_err {
-    ERR_FS_OVERFLOW
+    ERR_FS_OVERFLOW,
+    ERR_REQUEST_FAIL
 };
 int send_err(SOCKET client, enum net_err err);
  
@@ -61,7 +62,7 @@ struct tfs_req {
     enum req_type type;
     uint8_t fsid[FSID_LEN];
     uint16_t body_len;
-    uint8_t body[REQ_BODY_LEN];
+    uint8_t body[MAX_REQ_BODY_LEN];
 };
 
 enum res_type {
@@ -77,19 +78,19 @@ enum res_type {
 struct tfs_res {
     enum res_type type;
     uint16_t body_len;
-    uint8_t body[RES_BODY_LEN];
+    uint8_t body[MAX_RES_BODY_LEN];
 };
 
 /* protocol */
-void   pack_req(uint8_t **buf, struct tfs_req req);
+size_t pack_req(uint8_t **buf, struct tfs_req req);
 size_t pack_res(uint8_t **buf, struct tfs_res res);
 struct tfs_req unpack_req(uint8_t *req);
 struct tfs_res unpack_res(uint8_t *res);
-void print_req(struct tfs_req r);
+void print_req(struct tfs_req r, int show_body);
 void print_res(struct tfs_res r, int show_body);
 
 /* server */
-int init_server(char *port);
+int start_server(char *port);
 
 /* client */
 SOCKET init_client(char *ip, char *port);
