@@ -6,6 +6,7 @@
  - It will contain all filesystems on it
  - Will use the FSID in the req to lookup the right fs
  - Will need to write data structure (table?) to hold multiple filesystems
+2. Unified type for requests AND responses
 
 # Non-networking todo:
  * Add functionality for deleting files

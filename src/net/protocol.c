@@ -32,23 +32,19 @@ size_t pack_req(uint8_t **buf, struct tfs_req req)
         printf("body is too large to pack request.\n");
         return 0;
     }
-    if (req.body_len > 0) {
-        // copy body into [19,...]
+    // copy body into [19,...]
+    if (req.body_len > 0)
         memcpy(*buf+REQ_BODY_OFF, req.body, req.body_len);
-    }
     return req_len;
 }
 
 struct tfs_req unpack_req(uint8_t *req)
 {
     enum req_type type = req[REQ_TYPE_OFF]; // extract type
-
     uint8_t *fsid = malloc(FSID_LEN);
     memcpy(fsid, req+REQ_FSID_OFF, FSID_LEN); // extract fsid
-
     uint16_t body_len = ((uint16_t) req[REQ_BODYLEN_OFF+1] << 8)
         | req[REQ_BODYLEN_OFF]; // little endian
-
     struct tfs_req dreq = { .type = type, .body_len = body_len };
     memcpy(dreq.fsid, fsid, FSID_LEN);
     if (body_len > 0)
@@ -88,7 +84,8 @@ size_t pack_res(uint8_t **buf, struct tfs_res res)
 struct tfs_res unpack_res(uint8_t *res)
 {
     enum res_type type = res[RES_TYPE_OFF]; // extract type
-    uint16_t body_len = ((uint16_t) res[2] << 8) | res[1]; // little endian
+    uint16_t body_len = ((uint16_t) res[RES_BODYLEN_OFF+1] << 8)
+        | res[RES_BODYLEN_OFF]; // little endian
     struct tfs_res dres = { .type = type, .body_len = body_len };
     memcpy(dres.body, res+RES_BODY_OFF, body_len);
     return dres;
@@ -105,5 +102,6 @@ int send_err(SOCKET client, enum net_err err)
     size_t reslen = pack_res(&packed, res);
     int bytes_sent = send(client, (const void *) packed, reslen, 0);
     printf("sending error (%d bytes)\n", bytes_sent);
+    free(packed);
     return bytes_sent;
 }
