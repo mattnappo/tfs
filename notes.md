@@ -10,22 +10,20 @@
 
 # Non-networking todo:
  * Add functionality for deleting files
- * Check for filename length safety
  * Write a better `new_file` method to read a file from disk better
- * Better error handling
 
 # Other features:
- * ~~Serialization~~
  * Algorithmic file offset calculation
- * Networking
  * Encryption
- * Add blocks to memory
+ * Add blocks to vdisk
 
 # Network features
 The server will host multiple filesystems. The client can request:
- * To get a file
+ * To get a file: __IN PROGRESS CURRENTLY__
+ * ~~To get an entire fs~~
  * To put a file
  * To make a new fs
- * To get the entire fs
  * To get all fs ids
 
+
+Last thing I was doing: write line 123 of server.c

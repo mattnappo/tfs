@@ -94,7 +94,8 @@ int start_server(char *port);
 
 /* client */
 SOCKET init_client(char *ip, char *port);
-struct fs *client_get_fs(SOCKET server, uint8_t tfsid[]);
+struct fs*  client_get_fs  (SOCKET server, uint8_t tfsid[]);
+struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename);
 int send_fs();
 int send_file();
 

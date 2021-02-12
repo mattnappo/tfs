@@ -3,6 +3,7 @@
 
 #include <openssl/md5.h>
 #include <string.h>
+#include <inttypes.h>
 
 #define HASH_LEN 16
 

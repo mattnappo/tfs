@@ -1,6 +1,5 @@
 SRC    := src
 TARGET := bin/tfs.out
-MAIN   := cli.c
 
 CC      := gcc
 FLAGS   := -Wall -g
@@ -22,6 +21,7 @@ TEST_TARGETS := $(basename $(notdir $(TEST_SRCS)))
 all: tfs tests
 
 tfs: cli.c $(SOURCES) $(HEADERS) $(PROTO_SOURCES) $(PROTO_HEADERS)
+	mkdir -p bin/
 	$(CC) $(FLAGS) -o $(TARGET) $(INCLUDE_DIRS) $(SOURCES) $< $(PROTO_SOURCES) $(LIBS) $(INCLUDE)
 
 # ----- TESTS ----- #
