@@ -277,7 +277,7 @@ void   filesystem__free_unpacked
   assert(message->base.descriptor == &filesystem__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor file__field_descriptors[3] =
+static const ProtobufCFieldDescriptor file__field_descriptors[2] =
 {
   {
     "name",
@@ -303,28 +303,15 @@ static const ProtobufCFieldDescriptor file__field_descriptors[3] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
-  {
-    "s",
-    3,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
-    0,   /* quantifier_offset */
-    offsetof(File, s),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
 };
 static const unsigned file__field_indices_by_name[] = {
   1,   /* field[1] = bytes_ */
   0,   /* field[0] = name */
-  2,   /* field[2] = s */
 };
 static const ProtobufCIntRange file__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 0, 2 }
 };
 const ProtobufCMessageDescriptor file__descriptor =
 {
@@ -334,7 +321,7 @@ const ProtobufCMessageDescriptor file__descriptor =
   "File",
   "",
   sizeof(File),
-  3,
+  2,
   file__field_descriptors,
   file__field_indices_by_name,
   1,  file__number_ranges,

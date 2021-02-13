@@ -142,7 +142,8 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     return file;
 }
 
-int client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset)
+int client_put_file(
+    SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset)
 {
     // Make req
     if (strlen(f.name) >= FILENAME_SIZE) {
@@ -166,6 +167,7 @@ int client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offs
     // The rest of the body is the serialized file
     memcpy(req.body, (uint8_t *) &offset, 2);
     memcpy(req.body+2, buf, slen);
+    free(buf);
 
     // Get res
     struct tfs_res res = client_exchange(server, req, RES_SUCCESS);

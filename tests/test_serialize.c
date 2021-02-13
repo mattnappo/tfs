@@ -216,12 +216,12 @@ void test_io()
 int main()
 {
     test_file();
-    //test_vdisk();
-    //test_ftfile();
-    //test_ftbucket();
-    //test_ftable();
-    //test_fs();
-    //test_io();
+    test_vdisk();
+    test_ftfile();
+    test_ftbucket();
+    test_ftable();
+    test_fs();
+    test_io();
 
     return 0;
 }

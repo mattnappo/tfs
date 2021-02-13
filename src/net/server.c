@@ -198,8 +198,6 @@ static int handle_req_put_file(SOCKET client, struct tfs_req r)
         destroy_fs(fs);
         return 1;
     }
-    fs_list_files(*fs);
-
     send_success(client);
     destroy_fs(fs);
     return 0;

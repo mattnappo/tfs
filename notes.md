@@ -28,7 +28,12 @@
 The client can request to:
  * ~~get an entire fs~~
  * ~~get a file~~
- * put a file
+ * ~~put a file~~
  * make a new fs
  * get all fs ids
 
+# The plan
+1. Global server state
+2. Multiple filesystems
+3. Authorization
+4. CLI

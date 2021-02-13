@@ -33,11 +33,10 @@ struct  _File
   ProtobufCMessage base;
   char *name;
   ProtobufCBinaryData bytes_;
-  uint32_t s;
 };
 #define FILE__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&file__descriptor) \
-    , (char *)protobuf_c_empty_string, {0,NULL}, 0 }
+    , (char *)protobuf_c_empty_string, {0,NULL} }
 
 
 struct  _VDisk

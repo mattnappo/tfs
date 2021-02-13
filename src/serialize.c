@@ -347,5 +347,6 @@ struct fs *read_fs(const char* filename)
     size_t rlen = fread(buffer, 1, MAX_IO_SIZE, fd); 
     struct fs *dfs = deserialize_fs(buffer, rlen);
     free(buffer);
+    fclose(fd);
     return dfs;
 }
