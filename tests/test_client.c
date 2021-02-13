@@ -1,6 +1,6 @@
 #include "net/net.h"
 
-int test_get_fs()
+int test_client_get_fs(char *argv[])
 {
     SOCKET server;
     server = init_client(argv[1], argv[2]);
@@ -30,7 +30,7 @@ int test_get_fs()
     return 0;
 }
 
-int test_get_file()
+int test_client_get_file(char *argv[])
 {
     SOCKET server;
     server = init_client(argv[1], argv[2]);
@@ -48,16 +48,14 @@ int test_get_file()
     // memset(tfsid, 0x00, FSID_LEN);
 
     struct file f = client_get_file(server, tfsid, filename);
-    if (fs == NULL) {
-        printf("client: received FS is null\n");
-        return 0;
+    if (f.s == 0) {
+        printf("client: received file is null\n");
+        return 1;
     }
+
     print_file(f, ASCII);
-
-    destroy_fs(fs);
     destroy_file(f);
-}
-
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -67,7 +65,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    test_get_fs();
+    // test_client_get_fs(argv);
+    test_client_get_file(argv);
 
     return 0;
 }

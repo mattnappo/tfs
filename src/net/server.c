@@ -27,6 +27,15 @@ static struct lbuffer get_temp_fs()
     return lbuff;
 }
 
+static struct fs *get_temp_fs_defined()
+{
+    struct fs *tfs = new_fs();
+    struct file tfile1 = new_file("files/testfile.txt");
+    fs_add_file(tfs, tfile1, 0);
+    destroy_file(tfile1);
+    return tfs;
+}
+
 int start_server(char *port)
 {
     // Create server socket sd
@@ -122,8 +131,37 @@ static int handle_req_get_fs(SOCKET client, struct tfs_req r)
 
 static int handle_req_get_file(SOCKET client, struct tfs_req r)
 {
+    // Fetch the fs (eventually with fsid)
+    struct fs *fs = get_temp_fs_defined();
+    uint8_t filename[FILENAME_SIZE];
+    if (r.body_len >= FILENAME_SIZE) {
+        send_err(client, ERR_BODY_OVERFLOW);
+        return 1;
+    }
 
+    // Extract the filename
+    // Plus 1 to copy over a null pointer
+    memcpy(filename, r.body, r.body_len+1);
+    struct file f = fs_get_file(fs, (char *) filename);
+    if (f.s <= 0) {
+        send_err(client, ERR_FILE_NOT_EXIST);
+        return 1;
+    }
 
+    // Make the res
+    struct tfs_res res = { .type = RES_FILE, .body_len = f.s };
+    memcpy(res.body, f.bytes, f.s);
+    print_res(res, 1);
+
+    // Pack
+    uint8_t *packed;
+    size_t reslen = pack_res(&packed, res);
+    int sent_reslen = send(client, (const void *) packed, reslen, 0);
+    printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
+    free(packed);
+
+    destroy_file(f);
+    destroy_fs(fs);
     return 0;
 }
 

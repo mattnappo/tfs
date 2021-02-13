@@ -2,7 +2,9 @@
 
 const char *emesgs[] = {
     "server error: server fs is too large to send",
-    "server error: server unable to process request"
+    "server error: server unable to process request",
+    "server error: request body too large",
+    "server error: file with name not exist"
 };
 
 void print_req(struct tfs_req r, int show_body)
@@ -13,9 +15,9 @@ void print_req(struct tfs_req r, int show_body)
     printf("\n  body_len: %u\n", r.body_len);
 
     if (show_body) {
-        printf("  body:\n");
+        printf("  body:\n0x");
         for (int b = 0; b < r.body_len; b++)
-            printf("%02x ", r.body[b]);
+            printf("%02x", r.body[b]);
     }
     printf("\n\n");
 }

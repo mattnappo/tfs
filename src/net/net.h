@@ -45,7 +45,9 @@
 
 enum net_err {
     ERR_FS_OVERFLOW,
-    ERR_REQUEST_FAIL
+    ERR_REQUEST_FAIL,
+    ERR_BODY_OVERFLOW,
+    ERR_FILE_NOT_EXIST
 };
 int send_err(SOCKET client, enum net_err err);
  

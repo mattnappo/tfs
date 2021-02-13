@@ -81,3 +81,65 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
     free(raw_res);
     return dfs;
 }
+
+struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
+{
+    // Make req
+    size_t filename_len = strlen(filename);
+    printf("FILENAME IS %ld\n", filename_len);
+    if (filename_len >= FILENAME_SIZE) {
+        printf("filename '%ld' too large\n", filename_len);
+        struct file f = {};
+        return f;
+    }
+    struct tfs_req req = {
+        .type = REQ_GET_FILE,
+        .body_len = filename_len+1 // +1 for the null term
+    };
+    memcpy(req.body, filename, filename_len);
+    print_req(req, 1);
+
+    uint8_t *packed;
+    size_t packed_req_size = pack_req(&packed, req);
+
+    // Send request
+    int bytes_sent = send(server, packed, packed_req_size, 0);
+    if (bytes_sent != packed_req_size) {
+        fprintf(stderr, "send failed: did not send all req bytes\n");
+        print_req(req, 1);
+        free(packed);
+        struct file f = {};
+        return f;
+    }
+    free(packed);
+
+    // Read response
+    uint8_t *raw_res = calloc(MAX_RES_LEN, 1);
+    int recv_reslen = recv(server, raw_res, MAX_RES_LEN, 0);
+    printf("received %d bytes.\n", recv_reslen);
+    struct tfs_res res = unpack_res(raw_res);
+    print_res(res, 1);
+
+    if (res.type == RES_ERROR) {
+        printf("%s\n", (char *) res.body);
+        free(packed);
+        free(raw_res);
+        struct file f = {};
+        return f;
+    }
+    if (res.type != RES_FILE) {
+        printf("unimplemented response code for REQ_GET_FILE: %d\n",
+            (int) res.type);
+        struct file f = {};
+        return f;
+    }
+
+    struct file file = { .s = res.body_len };
+    memcpy(file.name, filename, filename_len);
+    file.bytes = malloc(res.body_len);
+    memcpy(file.bytes, res.body, res.body_len);
+    print_file(file, ASCII);
+    free(raw_res);
+
+    return file;
+}
