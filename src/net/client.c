@@ -48,20 +48,13 @@ static struct tfs_res client_exchange(
 {
     uint8_t *packed;
     size_t packed_req_size = pack_req(&packed, req);
-
-    // Send request
-    int bytes_sent = send(server, packed, packed_req_size, 0);
+    int packed_sent = send(server, packed, packed_req_size, 0);
     if (bytes_sent != packed_req_size) {
-        fprintf(stderr, "send failed: did not send all req bytes\n");
-        print_req(req, 1);
-        free(packed);
+        fprintf(stderr, "could not send all packed bytes\n");
         struct tfs_res eres = { .type = RES_NULL };
         return eres;
     }
-    free(packed);
-
-    // Read response
-    uint8_t *raw_res = calloc(MAX_RES_LEN, 1);
+    uint8_t *unpacked_res = calloc(MAX_RES_LEN, 1);
     int recv_reslen = recv(server, raw_res, MAX_RES_LEN, 0);
     printf("received %d bytes.\n", recv_reslen);
     struct tfs_res res = unpack_res(raw_res);
