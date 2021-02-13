@@ -15,8 +15,8 @@ static struct lbuffer get_temp_fs()
     struct file tfile2 = new_file("files/testfile2.txt");
     struct file tfile3 = new_file("files/test_file");
     fs_add_file(tfs, tfile1, 0);
-    fs_add_file(tfs, tfile2, 50);
-    fs_add_file(tfs, tfile3, 100);
+    fs_add_file(tfs, tfile2, 90);
+    fs_add_file(tfs, tfile3, 200);
     uint8_t *buffer;
     unsigned slen = serialize_fs(&buffer, tfs);
     destroy_file(tfile1);
@@ -133,18 +133,19 @@ static int handle_req_get_file(SOCKET client, struct tfs_req r)
 {
     // Fetch the fs (eventually with fsid)
     struct fs *fs = get_temp_fs_defined();
-    uint8_t filename[FILENAME_SIZE];
     if (r.body_len >= FILENAME_SIZE) {
         send_err(client, ERR_BODY_OVERFLOW);
+        destroy_fs(fs);
         return 1;
     }
 
-    // Extract the filename
-    // Plus 1 to copy over a null pointer
+    // Extract the filename, +1 to leave a null byte at the end
+    uint8_t filename[FILENAME_SIZE];
     memcpy(filename, r.body, r.body_len+1);
     struct file f = fs_get_file(fs, (char *) filename);
     if (f.s <= 0) {
         send_err(client, ERR_FILE_NOT_EXIST);
+        destroy_fs(fs);
         return 1;
     }
 
@@ -165,19 +166,69 @@ static int handle_req_get_file(SOCKET client, struct tfs_req r)
     return 0;
 }
 
-static int handle_req(SOCKET client, struct tfs_req r)
+static int handle_req_put_file(SOCKET client, struct tfs_req r, size_t reqlen)
+{
+    // Fetch the fs
+    struct fs *fs = get_temp_fs_defined();
+    if (r.body_len >= MAX_FILE_LEN) {
+        send_err(client, ERR_BODY_OVERFLOW);
+        destroy_fs(fs);
+        return 1;
+    }
+
+    // Extract the filename
+    char *filename = calloc(FILENAME_SIZE, 1);
+    for (int b = 0; b < FILENAME_SIZE; b++) {
+        memset(filename+b, r.body[b], 1);
+        if (r.body[b] == 0x00)
+            break;
+    }
+    printf("extracted filename: %s\n", filename);
+
+    // Extract the offset
+    size_t fnamelen = strlen(filename);
+    uint16_t offset = ((uint16_t) r.body[fnamelen+2] << 8)
+        | r.body[fnamelen+1];
+
+    // Extract the file bytes
+    size_t flen = 
+
+    // Reconstruct the file
+    struct file f = { .name = filename, .s =  };
+    // Insert the file into the fs
+    // TODO: Call the calc_offset() or find_valid_offset() func here
+    if (fs_add_file(fs, f, offset) != 0) {
+        send_err(client, ERR_FS_FAIL);
+        destroy_fs(fs);
+        return 1;
+    }
+    fs_list_files(*fs);
+    free(filename);
+
+    // Make the res
+    struct tfs_res res = { .type = RES_SUCCESS };
+    print_res(res, 1);
+    uint8_t *packed;
+    size_t reslen = pack_res(&packed, res);
+    int sent_reslen = send(client, (const void *) packed, reslen, 0);
+    printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
+    free(packed);
+
+    destroy_fs(fs);
+    return 0;
+}
+
+static int handle_req(SOCKET client, struct tfs_req r, size_t reqlen)
 {
     switch (r.type) {
     case REQ_GET_FS:
-        handle_req_get_fs(client, r);
-        break;
+        return handle_req_get_fs(client, r);
 
     case REQ_GET_FILE:
-        handle_req_get_file(client, r);
-        break;
+        return handle_req_get_file(client, r);
 
     case REQ_PUT_FILE:
-        break;
+        return handle_req_put_file(client, r, reqlen);
 
     case REQ_NEW_FS:
         break;
@@ -186,7 +237,7 @@ static int handle_req(SOCKET client, struct tfs_req r)
         break;
 
     default:
-        fprintf(stderr, "invalid request type option: %d\n", r.type);
+        fprintf(stderr, "invalid request type option: REQ%d\n", r.type);
         return 1;
     }
     return 0;
@@ -196,7 +247,7 @@ static int handle_conn(SOCKET client)
 {
     // Read request
     uint8_t *request = calloc(MAX_REQ_LEN, 1);
-    int reqlen = recv(client, request, MAX_REQ_LEN, 0);
+    size_t reqlen = recv(client, request, MAX_REQ_LEN, 0);
     if (reqlen < MIN_REQ_LEN || reqlen >= MAX_REQ_LEN) {
         fprintf(stderr, "recv failed, received %d bytes (%d MIN, %d MAX).\n",
             reqlen, MIN_REQ_LEN, MAX_REQ_LEN);
@@ -211,7 +262,7 @@ static int handle_conn(SOCKET client)
     struct tfs_req unpacked_req = unpack_req(request);
     print_req(unpacked_req, 1);
 
-    status = handle_req(client, unpacked_req);
+    status = handle_req(client, unpacked_req, reqlen);
     if (status > 0) {
         send_err(client, ERR_REQUEST_FAIL);
         free(request);

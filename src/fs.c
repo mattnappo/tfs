@@ -99,21 +99,22 @@ void destroy_fs(struct fs *fs)
     free(fs);
 }
 
-void fs_add_file(struct fs *fs, struct file f, size_t offset)
+int fs_add_file(struct fs *fs, struct file f, size_t offset)
 {
     if (f.s >= MAX_FILE_LEN) {
         printf("file '%s' is too large (size %lu).\n", f.name, f.s);
-        return;
+        return 1;
     }
     if (!is_valid_filename(f.name)) {
         printf("file '%s' has an invalid name.\n", f.name);
-        return;
+        return 1;
     }
     int status = ftable_add_file(fs->ft, f.name, f.s, offset);
     if (status == -1)
         printf("'%s' is already in the fs.\n", f.name);
     else
         vdisk_write(fs->disk, f.bytes, f.s, offset);
+    return 0;
 }
 
 int fs_remove_file();

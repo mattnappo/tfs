@@ -46,14 +46,21 @@ SOCKET init_client(char *ip, char *port)
 static struct tfs_res client_exchange(
     SOCKET server, struct tfs_req req, enum res_type target)
 {
+    printf("--- client making request ---\n");
+    print_req(req, 1);
+    printf("-----------------------------\n");
     uint8_t *packed;
     size_t packed_req_size = pack_req(&packed, req);
+    printf("\n begin raw req \n");
+    for (int b=0;b<packed_req_size;b++) {
+        printf("%02x ", packed[b]);
+    }
+    printf("\n end raw req \n");
 
     // Send request
     int bytes_sent = send(server, packed, packed_req_size, 0);
     if (bytes_sent != packed_req_size) {
         fprintf(stderr, "send failed: did not send all req bytes\n");
-        print_req(req, 1);
         free(packed);
         struct tfs_res eres = { .type = RES_NULL };
         return eres;
@@ -65,12 +72,13 @@ static struct tfs_res client_exchange(
     int recv_reslen = recv(server, raw_res, MAX_RES_LEN, 0);
     printf("received %d bytes.\n", recv_reslen);
     struct tfs_res res = unpack_res(raw_res);
-    print_res(res, 0);
+    printf("--- server response ---\n");
+    print_res(res, 1);
+    printf("-----------------------\n");
 
     // Check for errors
     if (res.type == RES_ERROR) {
         printf("%s\n", (char *) res.body);
-        free(packed);
         free(raw_res);
         struct tfs_res eres = { .type = RES_NULL };
         return eres;
@@ -78,7 +86,6 @@ static struct tfs_res client_exchange(
     if (res.type != target) {
         printf("unimplemented response code for REQ%d: RES%d\n",
             (int)target, (int)res.type);
-        free(packed);
         free(raw_res);
         struct tfs_res eres = { .type = RES_NULL };
         return eres;
@@ -116,7 +123,7 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
         .body_len = filename_len+1 // +1 for the null term
     };
     memcpy(req.body, filename, filename_len);
-    print_req(req, 1);
+    memcpy(req.fsid, tfsid, FSID_LEN);
 
     // Exchange
     struct tfs_res res = client_exchange(server, req, RES_FILE);
@@ -133,4 +140,41 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     memcpy(file.bytes, res.body, res.body_len);
     print_file(file, ASCII);
     return file;
+}
+
+int client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset)
+{
+    // Make req
+    size_t fnamelen = strlen(f.name);
+    if (fnamelen >= FILENAME_SIZE) {
+        printf("filename too long\n");
+        return 1;
+    }
+    if (f.s >= MAX_FILE_LEN) {
+        printf("file too big\n");
+        return 1;
+    }
+    struct tfs_req req = {
+        .type = REQ_PUT_FILE,
+        .body_len = fnamelen+1 +  2  +  f.s
+        /*          fname+null  offset bytes */
+    };
+    memcpy(req.fsid, tfsid, FSID_LEN);
+
+    // Copy filename into first fnamelen bytes
+    memcpy(req.body, f.name, fnamelen);
+    // Skip a byte (adding nullterm to previous fnamelen bytes) and copy
+    // over the 2-byte offset
+    memcpy(req.body+fnamelen+1, (uint8_t *) &offset, UINT16_LEN);
+    // Copy fbytes (no nullterm needed at end of 2-byte offset)
+    memcpy(req.body+fnamelen+1 + UINT16_LEN, f.bytes, f.s);
+
+    // Get res
+    struct tfs_res res = client_exchange(server, req, RES_SUCCESS);
+    if (res.type == RES_NULL) {
+        printf("unable to exchange with server\n");
+        return 1;
+    }
+    printf("successfully put file\n");
+    return 0;
 }

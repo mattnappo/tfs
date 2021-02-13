@@ -4,7 +4,8 @@ const char *emesgs[] = {
     "server error: server fs is too large to send",
     "server error: server unable to process request",
     "server error: request body too large",
-    "server error: file with name not exist"
+    "server error: file with name not exist",
+    "server error: internal fs error"
 };
 
 void print_req(struct tfs_req r, int show_body)

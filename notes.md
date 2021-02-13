@@ -1,29 +1,37 @@
 # Some random notes
 
-# Currently:
-1. Allow for multiple FSs
+# Cool features to add
+
+## Multiple FSs
  - Server will create a folder on disk called fsdb/
  - It will contain all filesystems on it
  - Will use the FSID in the req to lookup the right fs
  - Will need to write data structure (table?) to hold multiple filesystems
-2. Unified type for requests AND responses
+
+## Authentication
+ - Hash password on client side, send to server
+ - Server accepts or doesn't accept hash, responds with token
+ - Server stores tokens in some in-memory database
+ - Client must then send the token in every request
+
+## Other features
+ * CLI
+ * Logging?
+ * Algorithmic file offset calculation
+ * Add blocks to vdisk
 
 # Non-networking todo:
  * Add functionality for deleting files
  * Write a better `new_file` method to read a file from disk better
 
-# Other features:
- * Algorithmic file offset calculation
- * Encryption
- * Add blocks to vdisk
+# Network features todo
+The client can request to:
+ * ~~get an entire fs~~
+ * ~~get a file~~
+ * put a file
+ * make a new fs
+ * get all fs ids
 
-# Network features
-The server will host multiple filesystems. The client can request:
- * To get a file: __IN PROGRESS CURRENTLY__
- * ~~To get an entire fs~~
- * To put a file
- * To make a new fs
- * To get all fs ids
-
-
-Last thing I was doing: write line 123 of server.c
+# Random notes
+I just realized that for putting an fs, instead of manually serializing
+the file, I could have just used protobuf. That would be way easier.

@@ -27,7 +27,7 @@ struct fs {
 
 /* fs methods */
 struct fs*  new_fs         ();
-void        fs_add_file    (struct fs *fs, struct file f, size_t offset);
+int         fs_add_file    (struct fs *fs, struct file f, size_t offset);
 struct file fs_get_file    (struct fs *fs, char *name);
 void        fs_list_files  (struct fs  fs);
 int         fs_remove_file (struct fs *fs, struct file f);

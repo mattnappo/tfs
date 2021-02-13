@@ -47,7 +47,8 @@ enum net_err {
     ERR_FS_OVERFLOW,
     ERR_REQUEST_FAIL,
     ERR_BODY_OVERFLOW,
-    ERR_FILE_NOT_EXIST
+    ERR_FILE_NOT_EXIST,
+    ERR_FS_FAIL
 };
 int send_err(SOCKET client, enum net_err err);
  
@@ -74,7 +75,7 @@ enum res_type {
     RES_FSIDS,     /* a success, body=a list of fsids */
     RES_SUCCESS,   /* a general success, body=a general message */
     RES_MESG,      /* body=a general message */
-    RES_NULL,
+    RES_NULL,      /* request wasn't even sent */
     RES_MAX = 255
 };
 
@@ -99,7 +100,6 @@ int start_server(char *port);
 SOCKET init_client(char *ip, char *port);
 struct fs*  client_get_fs  (SOCKET server, uint8_t tfsid[]);
 struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename);
-int send_fs();
-int send_file();
+int         client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset);
 
 #endif
