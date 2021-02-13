@@ -74,6 +74,7 @@ enum res_type {
     RES_FSIDS,     /* a success, body=a list of fsids */
     RES_SUCCESS,   /* a general success, body=a general message */
     RES_MESG,      /* body=a general message */
+    RES_NULL,
     RES_MAX = 255
 };
 

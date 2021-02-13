@@ -42,11 +42,10 @@ SOCKET init_client(char *ip, char *port)
     return server_sd;
 }
 
-struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
+// Pack and send a request, return the server's response
+static struct tfs_res client_exchange(
+    SOCKET server, struct tfs_req req, enum res_type target)
 {
-    // Construct request
-    struct tfs_req req = { .type = REQ_GET_FS, .body_len = 0 };
-    memcpy(req.fsid, tfsid, FSID_LEN);
     uint8_t *packed;
     size_t packed_req_size = pack_req(&packed, req);
 
@@ -56,7 +55,8 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
         fprintf(stderr, "send failed: did not send all req bytes\n");
         print_req(req, 1);
         free(packed);
-        return NULL;
+        struct tfs_res eres = { .type = RES_NULL };
+        return eres;
     }
     free(packed);
 
@@ -67,18 +67,34 @@ struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
     struct tfs_res res = unpack_res(raw_res);
     print_res(res, 0);
 
+    // Check for errors
     if (res.type == RES_ERROR) {
         printf("%s\n", (char *) res.body);
         free(packed);
         free(raw_res);
-        return NULL;
+        struct tfs_res eres = { .type = RES_NULL };
+        return eres;
     }
-    if (res.type != RES_FS) {
-        printf("unimplemented response code for REQ_GET_FS: %d\n", (int)res.type);
-        return NULL;
+    if (res.type != target) {
+        printf("unimplemented response code for REQ%d: RES%d\n",
+            (int)target, (int)res.type);
+        free(packed);
+        free(raw_res);
+        struct tfs_res eres = { .type = RES_NULL };
+        return eres;
     }
-    struct fs *dfs = deserialize_fs(res.body, res.body_len);
     free(raw_res);
+    return res;
+}
+
+struct fs *client_get_fs(SOCKET server, uint8_t tfsid[])
+{
+    // Construct request
+    struct tfs_req req = { .type = REQ_GET_FS, .body_len = 0 };
+    memcpy(req.fsid, tfsid, FSID_LEN);
+    struct tfs_res res = client_exchange(server, req, RES_FS);
+
+    struct fs *dfs = deserialize_fs(res.body, res.body_len);
     return dfs;
 }
 
@@ -130,6 +146,8 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     if (res.type != RES_FILE) {
         printf("unimplemented response code for REQ_GET_FILE: %d\n",
             (int) res.type);
+        free(packed);
+        free(raw_res);
         struct file f = {};
         return f;
     }
@@ -140,6 +158,7 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     memcpy(file.bytes, res.body, res.body_len);
     print_file(file, ASCII);
     free(raw_res);
+    free(packed);
 
     return file;
 }
