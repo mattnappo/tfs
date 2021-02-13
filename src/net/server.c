@@ -103,6 +103,18 @@ int start_server(char *port)
     return 0;
 }
 
+static int send_success(SOCKET client)
+{
+    struct tfs_res res = { .type = RES_SUCCESS };
+    print_res(res, 1);
+    uint8_t *packed;
+    size_t reslen = pack_res(&packed, res);
+    int sent_reslen = send(client, (const void *) packed, reslen, 0);
+    printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
+    free(packed);
+    return sent_reslen;
+}
+
 static int handle_req_get_fs(SOCKET client, struct tfs_req r)
 {
     // Look up in fsdb (get random tmep fs for now)
@@ -166,7 +178,7 @@ static int handle_req_get_file(SOCKET client, struct tfs_req r)
     return 0;
 }
 
-static int handle_req_put_file(SOCKET client, struct tfs_req r, size_t reqlen)
+static int handle_req_put_file(SOCKET client, struct tfs_req r)
 {
     // Fetch the fs
     struct fs *fs = get_temp_fs_defined();
@@ -175,26 +187,10 @@ static int handle_req_put_file(SOCKET client, struct tfs_req r, size_t reqlen)
         destroy_fs(fs);
         return 1;
     }
-
-    // Extract the filename
-    char *filename = calloc(FILENAME_SIZE, 1);
-    for (int b = 0; b < FILENAME_SIZE; b++) {
-        memset(filename+b, r.body[b], 1);
-        if (r.body[b] == 0x00)
-            break;
-    }
-    printf("extracted filename: %s\n", filename);
-
-    // Extract the offset
-    size_t fnamelen = strlen(filename);
-    uint16_t offset = ((uint16_t) r.body[fnamelen+2] << 8)
-        | r.body[fnamelen+1];
-
-    // Extract the file bytes
-    size_t flen = 
-
-    // Reconstruct the file
-    struct file f = { .name = filename, .s =  };
+    
+    // Extract the offset and reconstruct the file
+    uint16_t offset = ((uint16_t) r.body[1] << 8) | r.body[0];
+    struct file f = deserialize_file(r.body+2, r.body_len-2);
     // Insert the file into the fs
     // TODO: Call the calc_offset() or find_valid_offset() func here
     if (fs_add_file(fs, f, offset) != 0) {
@@ -203,22 +199,13 @@ static int handle_req_put_file(SOCKET client, struct tfs_req r, size_t reqlen)
         return 1;
     }
     fs_list_files(*fs);
-    free(filename);
 
-    // Make the res
-    struct tfs_res res = { .type = RES_SUCCESS };
-    print_res(res, 1);
-    uint8_t *packed;
-    size_t reslen = pack_res(&packed, res);
-    int sent_reslen = send(client, (const void *) packed, reslen, 0);
-    printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
-    free(packed);
-
+    send_success(client);
     destroy_fs(fs);
     return 0;
 }
 
-static int handle_req(SOCKET client, struct tfs_req r, size_t reqlen)
+static int handle_req(SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
     case REQ_GET_FS:
@@ -228,7 +215,7 @@ static int handle_req(SOCKET client, struct tfs_req r, size_t reqlen)
         return handle_req_get_file(client, r);
 
     case REQ_PUT_FILE:
-        return handle_req_put_file(client, r, reqlen);
+        return handle_req_put_file(client, r);
 
     case REQ_NEW_FS:
         break;
@@ -249,20 +236,20 @@ static int handle_conn(SOCKET client)
     uint8_t *request = calloc(MAX_REQ_LEN, 1);
     size_t reqlen = recv(client, request, MAX_REQ_LEN, 0);
     if (reqlen < MIN_REQ_LEN || reqlen >= MAX_REQ_LEN) {
-        fprintf(stderr, "recv failed, received %d bytes (%d MIN, %d MAX).\n",
+        fprintf(stderr, "recv failed, received %ld bytes (%d MIN, %d MAX).\n",
             reqlen, MIN_REQ_LEN, MAX_REQ_LEN);
         send_err(client, ERR_REQUEST_FAIL);
         free(request);
         return 1;
     }
-    printf("received %d bytes.\n", reqlen);
+    printf("received %ld bytes.\n", reqlen);
 
     // Process the request
     int status;
     struct tfs_req unpacked_req = unpack_req(request);
     print_req(unpacked_req, 1);
 
-    status = handle_req(client, unpacked_req, reqlen);
+    status = handle_req(client, unpacked_req);
     if (status > 0) {
         send_err(client, ERR_REQUEST_FAIL);
         free(request);

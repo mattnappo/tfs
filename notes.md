@@ -32,6 +32,3 @@ The client can request to:
  * make a new fs
  * get all fs ids
 
-# Random notes
-I just realized that for putting an fs, instead of manually serializing
-the file, I could have just used protobuf. That would be way easier.

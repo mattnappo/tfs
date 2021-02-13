@@ -8,6 +8,24 @@ void get(struct ftable *ft, char name[])
     printf("name: %s\n  s: %zu\n  offset: %zu\n\n", test_get.name, test_get.s, test_get.offset);
 }
 
+void test_file()
+{
+    struct file nf = new_file("files/newtestfile");
+    uint8_t *buf;
+    unsigned len = serialize_file(&buf, nf);
+    destroy_file(nf);
+
+    struct file df = deserialize_file(buf, len);
+    if (df.s <= 0) {
+        printf("error deserializing\n");
+        return;
+    }
+
+    print_file(df, ASCII);
+    destroy_file(df);
+    free(buf);
+}
+
 void test_vdisk()
 {
     // Make a vdisk
@@ -197,12 +215,13 @@ void test_io()
 
 int main()
 {
-    test_vdisk();
-    test_ftfile();
-    test_ftbucket();
-    test_ftable();
-    test_fs();
-    test_io();
+    test_file();
+    //test_vdisk();
+    //test_ftfile();
+    //test_ftbucket();
+    //test_ftable();
+    //test_fs();
+    //test_io();
 
     return 0;
 }

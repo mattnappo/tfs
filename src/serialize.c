@@ -5,6 +5,38 @@ typedef enum serialize_error_ {
     ERR_DESERIALIZE = 1
 } serialize_error;
 
+
+unsigned serialize_file(uint8_t **buf, struct file file)
+{
+    File f = FILE__INIT;
+    f.name = file.name;
+    f.bytes_.len = file.s;
+    f.bytes_.data = malloc(file.s);
+    memcpy(f.bytes_.data, file.bytes, file.s);
+    unsigned len = file__get_packed_size(&f);
+    *buf = malloc(len);
+    file__pack(&f, *buf);
+    free(f.bytes_.data);
+    return len;
+}
+
+struct file deserialize_file(uint8_t *buf, unsigned len)
+{
+    File *f = file__unpack(NULL, len, buf);
+    if (f == NULL) {
+        printf("error unpacking bytes.\n");
+        struct file ef = {};
+        return ef;
+    }
+
+    struct file file = { .s = f->bytes_.len };
+    strcpy(file.name, f->name);
+    file.bytes = malloc(file.s);
+    memcpy(file.bytes, f->bytes_.data, f->bytes_.len);
+    file__free_unpacked(f, NULL);
+    return file;
+}
+
 unsigned serialize_vdisk(uint8_t **buf, struct vdisk *disk)
 {
     VDisk vdisk_b = VDISK__INIT;

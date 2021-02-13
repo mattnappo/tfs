@@ -145,8 +145,7 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
 int client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset)
 {
     // Make req
-    size_t fnamelen = strlen(f.name);
-    if (fnamelen >= FILENAME_SIZE) {
+    if (strlen(f.name) >= FILENAME_SIZE) {
         printf("filename too long\n");
         return 1;
     }
@@ -154,20 +153,19 @@ int client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offs
         printf("file too big\n");
         return 1;
     }
-    struct tfs_req req = {
-        .type = REQ_PUT_FILE,
-        .body_len = fnamelen+1 +  2  +  f.s
-        /*          fname+null  offset bytes */
-    };
+    uint8_t *buf;
+    unsigned slen = serialize_file(&buf, f);
+    if (slen+2 >= MAX_REQ_BODY_LEN) {
+        printf("serialized file is too large to send\n");
+        free(buf);
+        return 1;
+    }
+    struct tfs_req req = { .type = REQ_PUT_FILE, .body_len = 2+slen };
     memcpy(req.fsid, tfsid, FSID_LEN);
-
-    // Copy filename into first fnamelen bytes
-    memcpy(req.body, f.name, fnamelen);
-    // Skip a byte (adding nullterm to previous fnamelen bytes) and copy
-    // over the 2-byte offset
-    memcpy(req.body+fnamelen+1, (uint8_t *) &offset, UINT16_LEN);
-    // Copy fbytes (no nullterm needed at end of 2-byte offset)
-    memcpy(req.body+fnamelen+1 + UINT16_LEN, f.bytes, f.s);
+    // First 2 bytes are for the file offset, provided by client
+    // The rest of the body is the serialized file
+    memcpy(req.body, (uint8_t *) &offset, 2);
+    memcpy(req.body+2, buf, slen);
 
     // Get res
     struct tfs_res res = client_exchange(server, req, RES_SUCCESS);

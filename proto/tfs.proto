@@ -5,7 +5,6 @@ syntax = "proto3";
 message File { // struct file
     string name = 1;
     bytes bytes_ = 2;
-    uint32 s = 3;
 }
 
 /* actual types */
