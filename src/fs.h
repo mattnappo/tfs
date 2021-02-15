@@ -22,7 +22,6 @@ struct file {
 struct fs {
     struct vdisk *disk;
     struct ftable *ft;
-    uint8_t id[FSID_LEN];
 };
 
 /* fs methods */
@@ -32,6 +31,7 @@ struct file fs_get_file    (struct fs *fs, char *name);
 void        fs_list_files  (struct fs  fs);
 int         fs_remove_file (struct fs *fs, struct file f);
 void        fs_print_file  (struct fs *fs, char *name, int show_mem);
+void        calc_fsid      (struct fs *fs);
 void        destroy_fs     (struct fs *fs);
 
 /* front end file functions */

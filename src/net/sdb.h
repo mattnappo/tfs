@@ -3,14 +3,16 @@
 
 #include <inttypes.h>
 #include <pthread.h>
+#include <math.h>
 #include "fs.h"
 
 #define FSDB_BUCKETS 16
 
 static struct fsdb_fs {
-    struct fs *fs;        // The fs itself
-    struct fsdb_fs *next; // Forward link
-    struct fsdb_fs *prev; // Backward link
+    struct fs *fs;          // The fs itself
+    uint8_t fsid[FSID_LEN]; // The fs's fsid
+    struct fsdb_fs *next;   // Forward link
+    struct fsdb_fs *prev;   // Backward link
 };
 
 static struct fsdb_bucket {
@@ -34,6 +36,10 @@ typedef struct server_database {
     // logger
 } server_db;
 
+/* fsdb */
+static fsdb *init_fsdb();
+
+/* sdb */
 server_db *init_sdb();
 struct fs *fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN]);
 int           sdb_put_fs(server_db *sdb, struct fs *fs);

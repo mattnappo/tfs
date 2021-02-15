@@ -15,7 +15,4 @@ unsigned long to_radix(char *str);
 
 void err(char *emsg);
 
-// Hash function for a string key k with n partitions.
-unsigned long tbhash(char *k, int n);
-
 #endif

@@ -1,6 +1,15 @@
 #include "ftable.h"
 #include <math.h>
 
+// Knuth's number, as I like to call it
+#define A ((sqrt(5) - 1) / 2)
+
+unsigned long fthash(char *k)
+{
+    unsigned long key = to_radix(k);
+    return floor(NUM_BUCKETS * (key*A-floor(key*A)));
+}
+
 struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset)
 {
     struct ftable_file *file = malloc(sizeof(struct ftable_file));
@@ -34,7 +43,7 @@ struct ftable *new_ftable()
 static struct ftable_bucket *get_bucket_from_key(
     struct ftable *ft, char key[]
 ) {
-    return ft->buckets[tbhash(key, NUM_BUCKETS) % NUM_BUCKETS];
+    return ft->buckets[fthash(key) % NUM_BUCKETS];
 }
 
 void add_file_to_bucket(
@@ -64,7 +73,7 @@ int ftable_add_file(
         return -1;
     }
     struct ftable_file *f = new_ftable_file(name, s, offset);    
-    int key = tbhash(name, NUM_BUCKETS) % NUM_BUCKETS;
+    int key = fthash(name) % NUM_BUCKETS;
     struct ftable_bucket *target_bucket = ft->buckets[key];
     add_file_to_bucket(f, target_bucket);
     ft->n_files++;

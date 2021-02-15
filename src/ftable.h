@@ -41,6 +41,8 @@ struct ftable *new_ftable();
 struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset);
 struct ftable_bucket *new_ftable_bucket();
 
+unsigned long fthash(char *k);
+
 // Add a file to the ftable
 int ftable_add_file(
     struct ftable *ft, char name[],

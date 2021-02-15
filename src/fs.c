@@ -71,24 +71,22 @@ void print_file(struct file f, enum print_mode mode)
     }
 }
 
-static void recalc_id(struct fs *fs);
-
 struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
     fs->disk = new_vdisk();
     fs->ft  = new_ftable();
     memset(fs->id, 0, FSID_LEN);
-    recalc_id(fs);
     return fs;
 }
 
-static void recalc_id(struct fs *fs)
+void calc_fsid(struct fs *fs)
 {
     uint8_t digest[FSID_LEN];
     memset(digest, 0, FSID_LEN);
     uint8_t t = time(NULL);
     const uint8_t *key = (const uint8_t *) &t;
+    // Maybe serialize the fs to get better fsid calculation?
     calc_md5(key, sizeof(key), digest);
 }
 
