@@ -1,5 +1,8 @@
 #include "util.h"
 
+// Knuth's number, as I like to call it
+#define A ((sqrt(5) - 1) / 2)
+
 unsigned long ipow(int b, int x)
 {
     unsigned long s = 1;
@@ -23,3 +26,9 @@ void err(char *emsg)
     exit(1);
 }
 
+unsigned long tbhash(char *k, int n)
+{
+    // n is how many buckets in the table
+    unsigned long key = to_radix(k);
+    return floor(n * (key*A-floor(key*A)));
+}

@@ -95,11 +95,21 @@ void print_res(struct tfs_res r, int show_body);
 
 /* server */
 int start_server(char *port);
+/* server internal */
+static int send_success(SOCKET client);
+static int handle_conn (server_db *sdb, SOCKET client);
+static int handle_req  (server_db *sdb, SOCKET client, struct tfs_req r);
+static int handle_req_get_fs  (server_db *sdb, SOCKET client, struct tfs_req r);
+static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r);
+static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r);
 
 /* client */
 SOCKET init_client(char *ip, char *port);
 struct fs*  client_get_fs  (SOCKET server, uint8_t tfsid[]);
 struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename);
 int         client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset);
+/* client internal */
+static struct tfs_res client_exchange(
+    SOCKET server, struct tfs_req req, enum res_type target);
 
 #endif

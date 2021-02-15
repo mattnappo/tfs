@@ -1,13 +1,6 @@
 #include "net.h"
 
-struct lbuffer {
-    uint8_t *buf;
-    size_t len;
-};
-
-static int handle_conn(SOCKET client);
-static int handle_req(SOCKET client, struct tfs_req r);
-
+/*
 static struct lbuffer get_temp_fs()
 {
     struct fs *tfs = new_fs();
@@ -35,6 +28,7 @@ static struct fs *get_temp_fs_defined()
     destroy_file(tfile1);
     return tfs;
 }
+*/
 
 int start_server(char *port)
 {
@@ -115,20 +109,21 @@ static int send_success(SOCKET client)
     return sent_reslen;
 }
 
-static int handle_req_get_fs(SOCKET client, struct tfs_req r)
+static int handle_req_get_fs(server_db *sdb, SOCKET client, struct tfs_req r)
 {
-    // Look up in fsdb (get random tmep fs for now)
-    struct lbuffer temp_fs = get_temp_fs();
-    uint8_t *tfs_buf = temp_fs.buf;
-    if (temp_fs.len >= MAX_RES_BODY_LEN) {
-        free(tfs_buf);
+    // Look up in fsdb
+    struct fs *fs = sdb_get_fs(sdb, r.fsid);
+    uint8_t *fs_buf;
+    unsigned fs_len = serialize_fs(&fs_buf, fs);
+    if (fs_len >= MAX_RES_BODY_LEN) {
+        free(fs_buf);
         send_err(client, ERR_FS_OVERFLOW);
         return -1;
     }
 
     // Make the res
-    struct tfs_res res = { .type = RES_FS, .body_len = temp_fs.len };
-    memcpy(res.body, tfs_buf, temp_fs.len);
+    struct tfs_res res = { .type = RES_FS, .body_len = fs_len};
+    memcpy(res.body, fs_buf, fs_len);
     print_res(res, 0);
 
     // Serialize and send
@@ -136,12 +131,12 @@ static int handle_req_get_fs(SOCKET client, struct tfs_req r)
     size_t reslen = pack_res(&packed, res);
     int sent_reslen = send(client, (const void *) packed, reslen, 0);
     printf("sent %d of %lu bytes.\n", sent_reslen, reslen);
-    free(tfs_buf);
+    free(fs_buf);
     free(packed);
     return 0;
 }
 
-static int handle_req_get_file(SOCKET client, struct tfs_req r)
+static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs (eventually with fsid)
     struct fs *fs = get_temp_fs_defined();
@@ -178,7 +173,7 @@ static int handle_req_get_file(SOCKET client, struct tfs_req r)
     return 0;
 }
 
-static int handle_req_put_file(SOCKET client, struct tfs_req r)
+static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs
     struct fs *fs = get_temp_fs_defined();
@@ -203,17 +198,17 @@ static int handle_req_put_file(SOCKET client, struct tfs_req r)
     return 0;
 }
 
-static int handle_req(SOCKET client, struct tfs_req r)
+static int handle_req(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     switch (r.type) {
     case REQ_GET_FS:
-        return handle_req_get_fs(client, r);
+        return handle_req_get_fs(sdb, client, r);
 
     case REQ_GET_FILE:
-        return handle_req_get_file(client, r);
+        return handle_req_get_file(sdb, client, r);
 
     case REQ_PUT_FILE:
-        return handle_req_put_file(client, r);
+        return handle_req_put_file(sdb, client, r);
 
     case REQ_NEW_FS:
         break;
@@ -228,7 +223,7 @@ static int handle_req(SOCKET client, struct tfs_req r)
     return 0;
 }
 
-static int handle_conn(SOCKET client)
+static int handle_conn(server_db *sdb, SOCKET client)
 {
     // Read request
     uint8_t *request = calloc(MAX_REQ_LEN, 1);
@@ -247,7 +242,7 @@ static int handle_conn(SOCKET client)
     struct tfs_req unpacked_req = unpack_req(request);
     print_req(unpacked_req, 1);
 
-    status = handle_req(client, unpacked_req);
+    status = handle_req(sdb, client, unpacked_req);
     if (status > 0) {
         send_err(client, ERR_REQUEST_FAIL);
         free(request);
