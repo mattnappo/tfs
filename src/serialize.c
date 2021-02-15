@@ -340,7 +340,7 @@ int write_fs(const char *filename, struct fs *fs)
     return 0;
 }
 
-struct fs *read_fs(const char* filename)
+struct fs *read_fs(const char *filename)
 {
     FILE *fd = fopen(filename, "r");
     uint8_t *buffer = calloc(MAX_IO_SIZE, 1);

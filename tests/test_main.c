@@ -124,14 +124,17 @@ void test_fsid()
     uint8_t fsid[FSID_LEN];
     memcpy(fsid, temp_fsid.fsid, FSID_LEN);
     print_fsid(fsid);
+
+    char *str = stringify_fsid(fsid);
+    printf("[str fsid] %s\n", str);
 }
 
 int main()
 {
-    // test_fs();
-    // test_fs_simple();
-    // test_ft();
-    // test_invalid_filename();
+    test_fs();
+    test_fs_simple();
+    test_ft();
+    test_invalid_filename();
     test_fsid();
 
     return 0;

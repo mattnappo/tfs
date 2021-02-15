@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //test_client_get_fs(argv);
+    test_client_get_fs(argv);
     //test_client_get_file(argv);
-    test_client_put_file(argv);
+    //test_client_put_file(argv);
 
     return 0;
 }

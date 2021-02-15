@@ -4,29 +4,27 @@
 
 fsdb *init_fsdb()
 {
-    fsdb *fsdb = malloc(sizeof(fsdb));
+    fsdb *fdb = malloc(sizeof(fsdb));
     // Init the lock
     pthread_mutex_t *lock = malloc(sizeof(pthread_mutex_t));
     if (pthread_mutex_init(lock, NULL) != 0) {
         printf("failed to init fsdb lock\n");
         return NULL;
     }
-    fsdb->lock = lock;
+    fdb->lock = lock;
 
     // Make the map
-    fsdb->n_fs = 0;
+    fdb->n_fs = 0;
     for (int i = 0; i < FSDB_BUCKETS; i++) {
         // Create a new bucket
         struct fsdb_bucket *bucket = malloc(sizeof(struct fsdb_bucket));
         bucket->head = NULL;
         bucket->tail = NULL;
         bucket->n_entries = 0;
-        fsdb->buckets[i] = bucket;
+        fdb->buckets[i] = bucket;
     }
 
-    // Load each fs on disk into memory
-
-    return fsdb;
+    return fdb;
 }
 
 static uint64_t fsdb_hash(uint8_t fsid[FSID_LEN])
@@ -40,17 +38,17 @@ static uint64_t fsdb_hash(uint8_t fsid[FSID_LEN])
 }
 
 // Get bucket from fsid
-static struct fsdb_bucket *fsdb_get_bucket(fsdb *fsdb, uint8_t fsid[])
+static struct fsdb_bucket *fsdb_get_bucket(fsdb *fdb, uint8_t fsid[])
 {
-    return fsdb->buckets[fsdb_hash(fsid) % FSDB_BUCKETS];
+    return fdb->buckets[fsdb_hash(fsid) % FSDB_BUCKETS];
 }
 
-static int fs_in_fsdb(fsdb *fsdb, uint8_t fsid[FSID_LEN])
+static int fs_in_fsdb(fsdb *fdb, uint8_t fsid[FSID_LEN])
 {
-    struct fsdb_bucket *bucket = fsdb_get_bucket(fsdb, fsid);
+    struct fsdb_bucket *bucket = fsdb_get_bucket(fdb, fsid);
     struct fsdb_fs *temp = bucket->head;
     while (temp != NULL) {
-        if (memcmp(fsid, temp->fsid, FSID_LEN) == 0)
+        if (fsid_equal(fsid, temp->fsid))
             return 1;
         temp = temp->next;
     }
@@ -87,16 +85,39 @@ static void fsdb_add_entry(struct fsdb_bucket *bucket, struct fsdb_fs *entry)
 
 server_db *init_sdb()
 {
+    server_db *sdb = malloc(sizeof(server_db));
+    sdb->n_connections = 0;
+    sdb->fdb = init_fsdb();
 
-    // load fsdb
-
-    return NULL;
+    // Load each fs on disk
+    // For now, just load one
+    // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
+    // naming somehow.
+    struct fs *fs = read_fs("files/test_fs.fs");
+    fs_list_files(*fs);
+    if (fs == NULL) {
+        printf("unable to load fs from disk.\n");
+        return NULL;
+    }
+    if (sdb_put_fs(sdb, fs) != 0) {
+        printf("unable to insert fs into fsdb.\n");
+        return NULL;
+    }
+    destroy_fs(fs);
+    return sdb;
 }
 
-struct fs *sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
+struct fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
 {
-
-    return NULL;
+    struct fsdb_bucket *bucket = fsdb_get_bucket(sdb->fdb, fsid);
+    struct fsdb_fs *temp = bucket->head;
+    while (temp != NULL) {
+        if (fsid_equal(fsid, temp->fsid))
+            return *temp->fs;
+        temp = temp->next;
+    }
+    printf("fsid %s not in fsdb.\n", stringify_fsid(fsid));
+    return (struct fs) {};
 }
 
 int sdb_put_fs(server_db *sdb, struct fs *fs)
@@ -104,14 +125,14 @@ int sdb_put_fs(server_db *sdb, struct fs *fs)
     struct temp_fsid temp_fsid = calc_fsid(fs);
     uint8_t fsid[FSID_LEN];
     memcpy(fsid, temp_fsid.fsid, FSID_LEN);
-    if (fs_in_fsdb(sdb->fsdb, fsid) == 1) {
-        printf("fs 0x%*x already in the fsdb.\n", FSID_LEN, *fsid);
+    if (fs_in_fsdb(sdb->fdb, fsid) == 1) {
+        printf("fs %s already in the fsdb.\n", stringify_fsid(fsid));
         return 1;
     }
     struct fsdb_fs *entry = new_fsdb_fs(fs, fsid);
-    struct fsdb_bucket *bucket = fsdb_get_bucket(sdb->fsdb, fsid);
+    struct fsdb_bucket *bucket = fsdb_get_bucket(sdb->fdb, fsid);
     fsdb_add_entry(bucket, entry);
-    sdb->fsdb->n_fs++;
+    sdb->fdb->n_fs++;
     return 0;
 }
 

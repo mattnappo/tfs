@@ -33,6 +33,10 @@ int start_server(char *port)
 
     // Initialize the server state
     server_db *sdb = init_sdb();
+    if (sdb == NULL) {
+        printf("unable to initialize server state.\n");
+        return 1;
+    }
 
     // Listen
     int backlog = MAX_CONNECTIONS;
@@ -87,13 +91,15 @@ static int send_success(SOCKET client)
 static int handle_req_get_fs(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Look up in fsdb
-    struct fs *fs = sdb_get_fs(sdb, r.fsid);
+    struct fs fs = sdb_get_fs(sdb, r.fsid);
+    if (fs.ft == NULL)
+        return 1;
     uint8_t *fs_buf;
-    unsigned fs_len = serialize_fs(&fs_buf, fs);
+    unsigned fs_len = serialize_fs(&fs_buf, &fs);
     if (fs_len >= MAX_RES_BODY_LEN) {
         free(fs_buf);
         send_err(client, ERR_FS_OVERFLOW);
-        return -1;
+        return 1;
     }
 
     // Make the res
@@ -114,20 +120,20 @@ static int handle_req_get_fs(server_db *sdb, SOCKET client, struct tfs_req r)
 static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs (eventually with fsid)
-    struct fs *fs = sdb_get_fs(sdb, r.fsid);
+    struct fs fs = sdb_get_fs(sdb, r.fsid);
     if (r.body_len >= FILENAME_SIZE) {
         send_err(client, ERR_BODY_OVERFLOW);
-        destroy_fs(fs);
+        destroy_fs(&fs);
         return 1;
     }
 
     // Extract the filename, +1 to leave a null byte at the end
     uint8_t filename[FILENAME_SIZE];
     memcpy(filename, r.body, r.body_len+1);
-    struct file f = fs_get_file(fs, (char *) filename);
+    struct file f = fs_get_file(&fs, (char *) filename);
     if (f.s <= 0) {
         send_err(client, ERR_FILE_NOT_EXIST);
-        destroy_fs(fs);
+        destroy_fs(&fs);
         return 1;
     }
 
@@ -144,17 +150,17 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
     free(packed);
 
     destroy_file(f);
-    destroy_fs(fs);
+    destroy_fs(&fs);
     return 0;
 }
 
 static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs
-    struct fs *fs = sdb_get_fs(sdb, r.fsid);
+    struct fs fs = sdb_get_fs(sdb, r.fsid);
     if (r.body_len >= MAX_FILE_LEN) {
         send_err(client, ERR_BODY_OVERFLOW);
-        destroy_fs(fs);
+        //destroy_fs(fs);
         return 1;
     }
     
@@ -163,13 +169,13 @@ static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
     struct file f = deserialize_file(r.body+2, r.body_len-2);
     // Insert the file into the fs
     // TODO: Call the calc_offset() or find_valid_offset() func here
-    if (fs_add_file(fs, f, offset) != 0) {
+    if (fs_add_file(&fs, f, offset) != 0) {
         send_err(client, ERR_FS_FAIL);
-        destroy_fs(fs);
+        //destroy_fs(fs);
         return 1;
     }
     send_success(client);
-    destroy_fs(fs);
+    //destroy_fs(fs);
     return 0;
 }
 

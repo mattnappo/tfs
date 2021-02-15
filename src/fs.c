@@ -99,13 +99,24 @@ void print_fsid(uint8_t fsid[FSID_LEN])
     printf("\n");
 }
 
-/*
 char *stringify_fsid(uint8_t fsid[FSID_LEN])
 {
-    char *str = calloc(FSID_LEN+2, 1);
-    snprintf(str, FSID_LEN+2, "0x%*02x", FSID_LEN, fsid);
+    char *str = calloc(FSID_LEN*2+2+1, 1);
+    str[0] = '0';
+    str[1] = 'x';
+    for (int i = 0; i < FSID_LEN; i++) {
+        char temp[3];
+        snprintf(temp, 3, "%02x", fsid[i]);
+        strncat(str, temp, 2);
+    }
+    return str;
 }
-*/
+
+// 1 if they are equal, 0 if they are not equal
+int fsid_equal(uint8_t base[FSID_LEN], uint8_t other[FSID_LEN])
+{
+    return memcmp(base, other, FSID_LEN) == 0;
+}
 
 void destroy_fs(struct fs *fs)
 {

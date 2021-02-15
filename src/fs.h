@@ -41,6 +41,7 @@ void        destroy_fs     (struct fs *fs);
 struct temp_fsid calc_fsid(struct fs *fs);
 void print_fsid(uint8_t fsid[FSID_LEN]);
 char *stringify_fsid(uint8_t fsid[FSID_LEN]);
+int fsid_equal(uint8_t base[FSID_LEN], uint8_t other[FSID_LEN]);
 
 /* front end file functions */
 struct file new_file     (const char *name);

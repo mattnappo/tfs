@@ -4,7 +4,9 @@
 #include <inttypes.h>
 #include <pthread.h>
 #include <math.h>
+
 #include "fs.h"
+#include "serialize.h"
 
 #define FSDB_BUCKETS 16
 
@@ -30,14 +32,14 @@ typedef struct fsdb {
 // The main server state struct
 typedef struct server_database {
     uint8_t n_connections;
-    fsdb *fsdb;
+    fsdb *fdb;
     // valid tokendb
     // all current client IP and connection data
     // logger
 } server_db;
 
 server_db *init_sdb();
-struct fs *sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN]);
+struct fs  sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN]);
 int        sdb_put_fs(server_db *sdb, struct fs *fs);
 int        destroy_sdb(server_db *sdb);
 
