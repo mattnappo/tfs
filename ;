@@ -151,7 +151,7 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
 static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs
-    struct fs *fs = sdb_get_fs(sdb, r.fsid);
+    struct fs *fs = get_temp_fs_defined();
     if (r.body_len >= MAX_FILE_LEN) {
         send_err(client, ERR_BODY_OVERFLOW);
         destroy_fs(fs);

@@ -75,20 +75,37 @@ struct fs *new_fs()
 {
     struct fs *fs = malloc(sizeof(struct fs));
     fs->disk = new_vdisk();
-    fs->ft  = new_ftable();
-    memset(fs->id, 0, FSID_LEN);
+    fs->ft = new_ftable();
     return fs;
 }
 
-void calc_fsid(struct fs *fs)
+struct temp_fsid calc_fsid(struct fs *fs)
 {
-    uint8_t digest[FSID_LEN];
-    memset(digest, 0, FSID_LEN);
-    uint8_t t = time(NULL);
-    const uint8_t *key = (const uint8_t *) &t;
+    uint8_t fsid[FSID_LEN];
+    memset(fsid, 0, FSID_LEN);
+    const time_t key = time(NULL);
     // Maybe serialize the fs to get better fsid calculation?
-    calc_md5(key, sizeof(key), digest);
+    calc_md5((uint8_t *) &key, sizeof(time_t), fsid);
+    struct temp_fsid rfsid = {};
+    memcpy(rfsid.fsid, fsid, FSID_LEN);
+    return rfsid;
 }
+
+void print_fsid(uint8_t fsid[FSID_LEN])
+{
+    printf("0x");
+    for (int b = 0; b < FSID_LEN; b++)
+        printf("%02x", fsid[b]);
+    printf("\n");
+}
+
+/*
+char *stringify_fsid(uint8_t fsid[FSID_LEN])
+{
+    char *str = calloc(FSID_LEN+2, 1);
+    snprintf(str, FSID_LEN+2, "0x%*02x", FSID_LEN, fsid);
+}
+*/
 
 void destroy_fs(struct fs *fs)
 {

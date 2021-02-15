@@ -115,8 +115,7 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     size_t filename_len = strlen(filename);
     if (filename_len >= FILENAME_SIZE) {
         printf("filename '%ld' too large\n", filename_len);
-        struct file ef = {};
-        return ef;
+        return (struct file) {};
     }
     struct tfs_req req = {
         .type = REQ_GET_FILE,
@@ -129,8 +128,7 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     struct tfs_res res = client_exchange(server, req, RES_FILE);
     if (res.type == RES_NULL) {
         printf("unable to exchange with server\n");
-        struct file ef = {};
-        return ef;
+        return (struct file) {};
     }
 
     // Reconstruct file

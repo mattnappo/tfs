@@ -8,21 +8,21 @@
 
 #define FSDB_BUCKETS 16
 
-static struct fsdb_fs {
+struct fsdb_fs {
     struct fs *fs;          // The fs itself
     uint8_t fsid[FSID_LEN]; // The fs's fsid
     struct fsdb_fs *next;   // Forward link
     struct fsdb_fs *prev;   // Backward link
 };
 
-static struct fsdb_bucket {
+struct fsdb_bucket {
     struct fsdb_fs *head;
     struct fsdb_fs *tail;
     size_t n_entries;
 };
 
-static typedef struct fsdb {
-    pthread_mutex_t lock;
+typedef struct fsdb {
+    pthread_mutex_t *lock;
     struct fsdb_bucket *buckets[FSDB_BUCKETS];
     size_t n_fs; // Number of entries
 } fsdb;
@@ -36,13 +36,9 @@ typedef struct server_database {
     // logger
 } server_db;
 
-/* fsdb */
-static fsdb *init_fsdb();
-
-/* sdb */
 server_db *init_sdb();
-struct fs *fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN]);
-int           sdb_put_fs(server_db *sdb, struct fs *fs);
-int destroy_sdb(server_db *sdb);
+struct fs *sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN]);
+int        sdb_put_fs(server_db *sdb, struct fs *fs);
+int        destroy_sdb(server_db *sdb);
 
 #endif

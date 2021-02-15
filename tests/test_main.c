@@ -118,13 +118,21 @@ void test_invalid_filename()
     destroy_fs(tfs);
 }
 
+void test_fsid()
+{
+    struct temp_fsid temp_fsid = calc_fsid(NULL);
+    uint8_t fsid[FSID_LEN];
+    memcpy(fsid, temp_fsid.fsid, FSID_LEN);
+    print_fsid(fsid);
+}
 
 int main()
 {
-    test_fs();
-    test_fs_simple();
-    test_ft();
-    test_invalid_filename();
+    // test_fs();
+    // test_fs_simple();
+    // test_ft();
+    // test_invalid_filename();
+    test_fsid();
 
     return 0;
 }

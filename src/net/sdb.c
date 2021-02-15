@@ -2,26 +2,26 @@
 
 #define A ((sqrt(5) - 1) / 2)
 
-static fsdb *init_fsdb()
+fsdb *init_fsdb()
 {
-    fsdb fsdb;
+    fsdb *fsdb = malloc(sizeof(fsdb));
     // Init the lock
-    pthread_mutex_t *lock;
-    if (pthread_mutex_init(&lock, NULL) != 0) {
+    pthread_mutex_t *lock = malloc(sizeof(pthread_mutex_t));
+    if (pthread_mutex_init(lock, NULL) != 0) {
         printf("failed to init fsdb lock\n");
-        return 1;
+        return NULL;
     }
-    fsdb.lock = lock;
+    fsdb->lock = lock;
 
     // Make the map
-    fsdb.n_fs = 0;
+    fsdb->n_fs = 0;
     for (int i = 0; i < FSDB_BUCKETS; i++) {
         // Create a new bucket
         struct fsdb_bucket *bucket = malloc(sizeof(struct fsdb_bucket));
         bucket->head = NULL;
         bucket->tail = NULL;
         bucket->n_entries = 0;
-        fsdb.buckets[i] = bucket;
+        fsdb->buckets[i] = bucket;
     }
 
     // Load each fs on disk into memory
@@ -48,9 +48,9 @@ static struct fsdb_bucket *fsdb_get_bucket(fsdb *fsdb, uint8_t fsid[])
 static int fs_in_fsdb(fsdb *fsdb, uint8_t fsid[FSID_LEN])
 {
     struct fsdb_bucket *bucket = fsdb_get_bucket(fsdb, fsid);
-    struct fsdb_bucket *temp = bucket->head;
+    struct fsdb_fs *temp = bucket->head;
     while (temp != NULL) {
-        if (memcmp(fsid, temp->fsid) == 0)
+        if (memcmp(fsid, temp->fsid, FSID_LEN) == 0)
             return 1;
         temp = temp->next;
     }
@@ -76,7 +76,7 @@ static void fsdb_add_entry(struct fsdb_bucket *bucket, struct fsdb_fs *entry)
     }
 
     // TODO: Make this a forward insertion, not an append
-    struct fsdb_entry *temp = bucket->head;
+    struct fsdb_fs *temp = bucket->head;
     while (temp->next != NULL)
         temp = temp->next;
     temp->next = entry;
@@ -93,7 +93,7 @@ server_db *init_sdb()
     return NULL;
 }
 
-struct fs *fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
+struct fs *sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
 {
 
     return NULL;
@@ -101,9 +101,11 @@ struct fs *fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
 
 int sdb_put_fs(server_db *sdb, struct fs *fs)
 {
-    uint8_t fsid[] = calc_fsid(fs);
+    struct temp_fsid temp_fsid = calc_fsid(fs);
+    uint8_t fsid[FSID_LEN];
+    memcpy(fsid, temp_fsid.fsid, FSID_LEN);
     if (fs_in_fsdb(sdb->fsdb, fsid) == 1) {
-        printf("fs 0x%*.02x already in the fsdb.\n", FSID_LEN, fsid);
+        printf("fs 0x%*x already in the fsdb.\n", FSID_LEN, *fsid);
         return 1;
     }
     struct fsdb_fs *entry = new_fsdb_fs(fs, fsid);

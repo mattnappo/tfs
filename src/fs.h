@@ -24,6 +24,10 @@ struct fs {
     struct ftable *ft;
 };
 
+struct temp_fsid {
+    uint8_t fsid[FSID_LEN];
+};
+
 /* fs methods */
 struct fs*  new_fs         ();
 int         fs_add_file    (struct fs *fs, struct file f, size_t offset);
@@ -31,8 +35,12 @@ struct file fs_get_file    (struct fs *fs, char *name);
 void        fs_list_files  (struct fs  fs);
 int         fs_remove_file (struct fs *fs, struct file f);
 void        fs_print_file  (struct fs *fs, char *name, int show_mem);
-void        calc_fsid      (struct fs *fs);
 void        destroy_fs     (struct fs *fs);
+
+/* fsid methods */
+struct temp_fsid calc_fsid(struct fs *fs);
+void print_fsid(uint8_t fsid[FSID_LEN]);
+char *stringify_fsid(uint8_t fsid[FSID_LEN]);
 
 /* front end file functions */
 struct file new_file     (const char *name);
