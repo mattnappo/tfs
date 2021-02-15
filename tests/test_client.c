@@ -10,11 +10,10 @@ int test_client_get_fs(char *argv[])
     }
 
     // Construct the fsid
-    uint8_t tfsid[FSID_LEN] = { 0xab, 0xab, 0x12, 0x32,
-                                0x46, 0xf6, 0xd3, 0xd4,
-                                0x16, 0x2c, 0xff, 0xaf,
-                                0xcd, 0xf3, 0xee, 0xe2 };
-    // memset(tfsid, 0x00, FSID_LEN);
+    uint8_t tfsid[FSID_LEN] = { 0x8d,0xc3,0xe5,0xdc,  
+                                0x8a,0x31,0x52,0xd7,  
+                                0x3f,0x7f,0x8b,0xb5,  
+                                0x5b,0x95,0x13,0xb2 };
 
     struct fs *fs = client_get_fs(server, tfsid);
     if (fs == NULL) {
@@ -40,10 +39,10 @@ int test_client_get_file(char *argv[])
     }
 
     // Construct the fsid from which the file will be fetched
-    uint8_t tfsid[FSID_LEN] = { 0xab, 0xab, 0x12, 0x32,
-                                0x46, 0xf6, 0xd3, 0xd4,
-                                0x16, 0x2c, 0xff, 0xaf,
-                                0xcd, 0xf3, 0xee, 0xe2 };
+    uint8_t tfsid[FSID_LEN] = { 0x8d,0xc3,0xe5,0xdc,  
+                                0x8a,0x31,0x52,0xd7,  
+                                0x3f,0x7f,0x8b,0xb5,  
+                                0x5b,0x95,0x13,0xb2 };
     char *filename = "files/testfile.txt"; // The file to be fetched
     // memset(tfsid, 0x00, FSID_LEN);
 
@@ -66,10 +65,10 @@ int test_client_put_file(char *argv[])
         fprintf(stderr, "invalid server socket\n");
         return 1;
     }
-    uint8_t tfsid[FSID_LEN] = { 0xab, 0xab, 0x12, 0x32,
-                                0x46, 0xf6, 0xd3, 0xd4,
-                                0x16, 0x2c, 0xff, 0xaf,
-                                0xcd, 0xf3, 0xee, 0xe2 };
+    uint8_t tfsid[FSID_LEN] = { 0x8d,0xc3,0xe5,0xdc,  
+                                0x8a,0x31,0x52,0xd7,  
+                                0x3f,0x7f,0x8b,0xb5,  
+                                0x5b,0x95,0x13,0xb2 };
     struct file f = new_file("files/newtestfile");
     int status = client_put_file(server, tfsid, f, 30);
     if (status != 0) {
