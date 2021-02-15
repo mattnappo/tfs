@@ -519,7 +519,7 @@ const ProtobufCMessageDescriptor filetable__descriptor =
   (ProtobufCMessageInit) filetable__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor filesystem__field_descriptors[2] =
+static const ProtobufCFieldDescriptor filesystem__field_descriptors[3] =
 {
   {
     "disk",
@@ -545,15 +545,28 @@ static const ProtobufCFieldDescriptor filesystem__field_descriptors[2] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
+  {
+    "fsid",
+    3,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_BYTES,
+    0,   /* quantifier_offset */
+    offsetof(Filesystem, fsid),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
 };
 static const unsigned filesystem__field_indices_by_name[] = {
   0,   /* field[0] = disk */
+  2,   /* field[2] = fsid */
   1,   /* field[1] = ft */
 };
 static const ProtobufCIntRange filesystem__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 3 }
 };
 const ProtobufCMessageDescriptor filesystem__descriptor =
 {
@@ -563,7 +576,7 @@ const ProtobufCMessageDescriptor filesystem__descriptor =
   "Filesystem",
   "",
   sizeof(Filesystem),
-  2,
+  3,
   filesystem__field_descriptors,
   filesystem__field_indices_by_name,
   1,  filesystem__number_ranges,

@@ -263,6 +263,12 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
     sft.buckets = buckets;
     sft.n_files = fs->ft->n_files;
 
+    // Calculate and copy over the fsid
+    struct temp_fsid temp_fsid = calc_fsid(fs);
+    sfs.fsid.data = malloc(FSID_LEN);
+    sfs.fsid.len = FSID_LEN;
+    memcpy(sfs.fsid.data, temp_fsid.fsid, FSID_LEN);
+
     // Set into final fs to be serialized
     sfs.ft = &sft;
     sfs.disk = &sdisk;
@@ -277,7 +283,7 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
         len = 0;
     }
 
-    // Free vdisk and ftable
+    // Free vdisk, ftable, and fsid
     free(sdisk.bytes_.data);
     for (int j = 0; j < NUM_BUCKETS; j++) {
         for (int i = 0; i < buckets[j]->n_files; i++) {
@@ -288,6 +294,7 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
         free(buckets[j]);
     }
     free(buckets);
+    free(sfs.fsid.data);
 
     return len;
 }
@@ -319,6 +326,11 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
             dfs->ft->n_files++;
         }
     }
+
+    // Print fsid
+    //uint8_t fsid[FSID_LEN];
+    //memcpy(fsid, fs->fsid.data, FSID_LEN);
+    //print_fsid(fsid);
 
     filesystem__free_unpacked(fs, NULL);
     return dfs;

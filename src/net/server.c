@@ -40,10 +40,14 @@ int start_server(char *port)
 
     // Listen
     int backlog = MAX_CONNECTIONS;
-    while (1) {
+    // Process only n requests (for testing purposes)
+    int maxnreqs = 1;
+    int nreqs = 0;
+    while (nreqs < maxnreqs) {
         status = listen(sd, backlog);
         if (status < 0) {
             fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
+            destroy_sdb(sdb);
             return 1;
         }
 
@@ -54,6 +58,7 @@ int start_server(char *port)
             (struct sockaddr *) &client_addr, &client_len);
         if (!ISVALIDSOCKET(client_sd)) {
             fprintf(stderr, "accept failed: %d\n", GETSOCKETERRNO());
+            destroy_sdb(sdb);
             return 1;
         }
         char addr_buffer[100];
@@ -65,14 +70,16 @@ int start_server(char *port)
         status = handle_conn(sdb, client_sd);
         if (status != 0) {
             fprintf(stderr, "handle_conn failed: %d\n", status);
+            destroy_sdb(sdb);
             return 1;
         }
 
         // Cleanup
         CLOSESOCKET(client_sd);
+        nreqs++;
     }
     CLOSESOCKET(sd);
-
+    destroy_sdb(sdb);
     return 0;
 }
 

@@ -94,16 +94,15 @@ server_db *init_sdb()
     // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
     // naming somehow.
     struct fs *fs = read_fs("files/test_fs.fs");
-    fs_list_files(*fs);
     if (fs == NULL) {
         printf("unable to load fs from disk.\n");
         return NULL;
     }
+    fs_list_files(*fs);
     if (sdb_put_fs(sdb, fs) != 0) {
         printf("unable to insert fs into fsdb.\n");
         return NULL;
     }
-    destroy_fs(fs);
     return sdb;
 }
 
@@ -116,7 +115,9 @@ struct fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
             return *temp->fs;
         temp = temp->next;
     }
-    printf("fsid %s not in fsdb.\n", stringify_fsid(fsid));
+    char *sfsid = stringify_fsid(fsid);
+    printf("fsid %s not in fsdb.\n", sfsid);
+    free(sfsid);
     return (struct fs) {};
 }
 
@@ -126,7 +127,9 @@ int sdb_put_fs(server_db *sdb, struct fs *fs)
     uint8_t fsid[FSID_LEN];
     memcpy(fsid, temp_fsid.fsid, FSID_LEN);
     if (fs_in_fsdb(sdb->fdb, fsid) == 1) {
-        printf("fs %s already in the fsdb.\n", stringify_fsid(fsid));
+        char *sfsid = stringify_fsid(fsid);
+        printf("fs %s already in the fsdb.\n", sfsid);
+        free(sfsid);
         return 1;
     }
     struct fsdb_fs *entry = new_fsdb_fs(fs, fsid);
@@ -136,7 +139,33 @@ int sdb_put_fs(server_db *sdb, struct fs *fs)
     return 0;
 }
 
-int destroy_sdb(server_db *sdb)
+void destroy_fsdb_fs(struct fsdb_fs *entry)
 {
-    return 0;
+    destroy_fs(entry->fs);
+    free(entry);
+}
+
+void destroy_fsdb_bucket(struct fsdb_bucket *bucket)
+{
+    struct fsdb_fs *temp;
+    while (bucket->head != NULL) {
+        temp = bucket->head;
+        bucket->head = bucket->head->next;
+        destroy_fsdb_fs(temp);
+    }
+    free(bucket);
+}
+
+void destroy_fsdb(fsdb *fdb)
+{
+    for (int i = 0; i < FSDB_BUCKETS; i++)
+        destroy_fsdb_bucket(fdb->buckets[i]);
+    free(fdb->lock);
+    free(fdb);
+}
+
+void destroy_sdb(server_db *sdb)
+{
+    destroy_fsdb(sdb->fdb);
+    free(sdb);
 }

@@ -89,10 +89,11 @@ struct  _Filesystem
   ProtobufCMessage base;
   VDisk *disk;
   Filetable *ft;
+  ProtobufCBinaryData fsid;
 };
 #define FILESYSTEM__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&filesystem__descriptor) \
-    , NULL, NULL }
+    , NULL, NULL, {0,NULL} }
 
 
 /* File methods */

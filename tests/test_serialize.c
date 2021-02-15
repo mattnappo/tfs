@@ -213,6 +213,12 @@ void test_io()
     destroy_fs(dfs2);
 }
 
+void test_fsid()
+{
+    struct fs *fs = read_fs("files/test_fs.fs");
+    destroy_fs(fs);
+}
+
 int main()
 {
     test_file();
@@ -222,6 +228,7 @@ int main()
     test_ftable();
     test_fs();
     test_io();
+    test_fsid();
 
     return 0;
 }

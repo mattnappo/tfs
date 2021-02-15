@@ -31,5 +31,6 @@ message Filetable { // struct ftable
 message Filesystem { // struct fs
     VDisk disk = 1;
     Filetable ft = 2;
+    bytes fsid = 3;
 }
 
