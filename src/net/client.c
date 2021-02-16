@@ -136,7 +136,6 @@ struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename)
     memcpy(file.name, filename, filename_len);
     file.bytes = malloc(res.body_len);
     memcpy(file.bytes, res.body, res.body_len);
-    print_file(file, ASCII);
     return file;
 }
 

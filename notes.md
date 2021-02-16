@@ -41,3 +41,4 @@ The client can request to:
 # Bugs?
  - Check whether I need to un-comment the destroy_fs in server handle_req methods
  - Also check if those need to be static or not
+ - Switch sdb_put_fs from taking a pointer to taking an actual fs

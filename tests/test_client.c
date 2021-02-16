@@ -1,10 +1,14 @@
 #include "net/net.h"
 
+uint8_t tfsid[FSID_LEN] = {0x49,0x06,0x1a,0x0c,0x37,0x61,0x73,0xfa,0xfd,0x88,0xcd,0xac,0x5b,0x09,0x3b,0x21};
+
 static struct fs *get_temp_fs()
 {
     struct fs *tfs = new_fs();
     struct file tfile1 = new_file("files/testfile.txt");
-    fs_add_file(tfs, tfile1, 0); destroy_file(tfile1); return tfs;
+    fs_add_file(tfs, tfile1, 0);
+    destroy_file(tfile1);
+    return tfs;
 }
 
 int test_client_get_fs(char *argv[])
@@ -16,19 +20,16 @@ int test_client_get_fs(char *argv[])
         return 1;
     }
 
-    // Construct the fsid
-    uint8_t tfsid[FSID_LEN] = {0xaa,0x6c,0xf2,0x8a,0x73,0x2f,0x5c,0x9d,0xf6,0xc6,0x1f,0x5e,0xc3,0x54,0x51,0x1c};
-
     struct fs *fs = client_get_fs(server, tfsid);
     if (fs == NULL) {
         printf("client: received FS is null\n");
         return 0;
     }
     fs_list_files(*fs);
-    struct file f = fs_get_file(fs, "files/test_file");
+    struct file f = fs_get_file(fs, "files/testfile.txt");
     print_file(f, ASCII);
 
-    destroy_fs(fs);
+    //destroy_fs(fs);
     destroy_file(f);
     return 0;
 }
@@ -42,11 +43,6 @@ int test_client_get_file(char *argv[])
         return 1;
     }
 
-    // Construct the fsid from which the file will be fetched
-    uint8_t tfsid[FSID_LEN] = { 0x8d,0xc3,0xe5,0xdc,  
-                                0x8a,0x31,0x52,0xd7,  
-                                0x3f,0x7f,0x8b,0xb5,  
-                                0x5b,0x95,0x13,0xb2 };
     char *filename = "files/testfile.txt"; // The file to be fetched
     // memset(tfsid, 0x00, FSID_LEN);
 
@@ -69,10 +65,6 @@ int test_client_put_file(char *argv[])
         fprintf(stderr, "invalid server socket\n");
         return 1;
     }
-    uint8_t tfsid[FSID_LEN] = { 0x8d,0xc3,0xe5,0xdc,  
-                                0x8a,0x31,0x52,0xd7,  
-                                0x3f,0x7f,0x8b,0xb5,  
-                                0x5b,0x95,0x13,0xb2 };
     struct file f = new_file("files/newtestfile");
     int status = client_put_file(server, tfsid, f, 30);
     if (status != 0) {
@@ -110,9 +102,19 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    printf("\nGETTING FS\n");
     test_client_get_fs(argv);
-    //test_client_get_file(argv);
-    //test_client_put_file(argv);
+
+    printf("\nGETTING FILE\n");
+    test_client_get_file(argv);
+
+    printf("\nPUTTING FILE\n");
+    test_client_put_file(argv);
+
+    printf("\nGETTING (NEW) FS\n");
+    test_client_get_fs(argv);
+
+    //printf("\nPUTTING SAME FS (SHOULD ERROR)\n");
     //test_client_put_fs(argv);
 
     return 0;

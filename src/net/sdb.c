@@ -83,6 +83,8 @@ static void fsdb_add_entry(struct fsdb_bucket *bucket, struct fsdb_fs *entry)
     bucket->n_entries++;
 }
 
+/* ----- PUBLIC METHODS ----- */
+
 server_db *init_sdb()
 {
     server_db *sdb = malloc(sizeof(server_db));
@@ -93,7 +95,7 @@ server_db *init_sdb()
     // For now, just load one
     // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
     // naming somehow.
-    struct fs *fs = read_fs("/home/matt/git/tfs/files/test_fs.fs");
+    struct fs *fs = read_fs("files/test_fs.fs");
     if (fs == NULL) {
         printf("unable to load fs from disk.\n");
         return NULL;
@@ -136,7 +138,25 @@ int sdb_put_fs(server_db *sdb, struct fs *fs)
     struct fsdb_bucket *bucket = fsdb_get_bucket(sdb->fdb, fsid);
     fsdb_add_entry(bucket, entry);
     sdb->fdb->n_fs++;
+    char *sfsid = stringify_fsid(fsid);
+    printf("put fsid %s in fsdb.\n", sfsid);
+    free(sfsid);
     return 0;
+}
+
+void sdb_list_fsids(server_db *sdb)
+{
+    printf("===== BEGIN FSDB DUMP =====\n");
+    for (int i = 0; i < FSDB_BUCKETS; i++) {
+        struct fsdb_fs *temp = sdb->fdb->buckets[i]->head;
+        while (temp != NULL) {
+            char *fsid = stringify_fsid(temp->fsid);
+            printf("%s\n", fsid);
+            free(fsid);
+            temp = temp->next;
+        }
+    }
+    printf("===== END FSDB DUMP =====\n");
 }
 
 void destroy_fsdb_fs(struct fsdb_fs *entry)

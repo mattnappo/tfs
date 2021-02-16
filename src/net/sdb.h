@@ -38,9 +38,10 @@ typedef struct server_database {
     // logger
 } server_db;
 
-server_db *init_sdb();
-struct fs  sdb_get_fs (server_db *sdb, uint8_t fsid[FSID_LEN]);
-int        sdb_put_fs (server_db *sdb, struct fs *fs);
-void       destroy_sdb(server_db *sdb);
+server_db *init_sdb      ();
+struct fs  sdb_get_fs    (server_db *sdb, uint8_t fsid[FSID_LEN]);
+int        sdb_put_fs    (server_db *sdb, struct fs *fs);
+void       destroy_sdb   (server_db *sdb);
+void       sdb_list_fsids(server_db *sdb);
 
 #endif

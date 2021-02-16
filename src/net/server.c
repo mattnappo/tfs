@@ -41,9 +41,9 @@ int start_server(char *port)
     // Listen
     int backlog = MAX_CONNECTIONS;
     // Process only n requests (for testing purposes)
-    int maxnreqs = 2;
+    int maxnreqs = 3;
     int nreqs = 0;
-    while (nreqs < maxnreqs) {
+    while (1) {
         status = listen(sd, backlog);
         if (status < 0) {
             fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
@@ -69,9 +69,9 @@ int start_server(char *port)
         // Handle the connection
         status = handle_conn(sdb, client_sd);
         if (status != 0) {
-            fprintf(stderr, "handle_conn failed: %d\n", status);
-            destroy_sdb(sdb);
-            return 1;
+            printf("handle_conn failed: %d\n", status);
+            //destroy_sdb(sdb);
+            //return 1;
         }
 
         // Cleanup
@@ -228,6 +228,7 @@ static int handle_req(server_db *sdb, SOCKET client, struct tfs_req r)
         fprintf(stderr, "invalid request type option: REQ%d\n", r.type);
         return 1;
     }
+    sdb_list_fsids(sdb);
     return 0;
 }
 
