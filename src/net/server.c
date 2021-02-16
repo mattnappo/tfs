@@ -41,7 +41,7 @@ int start_server(char *port)
     // Listen
     int backlog = MAX_CONNECTIONS;
     // Process only n requests (for testing purposes)
-    int maxnreqs = 1;
+    int maxnreqs = 2;
     int nreqs = 0;
     while (nreqs < maxnreqs) {
         status = listen(sd, backlog);
@@ -185,6 +185,23 @@ static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
     //destroy_fs(fs);
     return 0;
 }
+static int handle_req_put_fs(server_db *sdb, SOCKET client, struct tfs_req r)
+{
+    struct fs *dfs = deserialize_fs(r.body, r.body_len);
+    if (dfs == NULL) {
+        send_err(client, ERR_INVALID_FS);
+        destroy_fs(dfs);
+        return 1;
+    }
+    if (sdb_put_fs(sdb, dfs) != 0) {
+        send_err(client, ERR_FSDB_ERR);
+        destroy_fs(dfs);
+        return 1;
+    }
+    send_success(client);
+    //destroy_fs(dfs);
+    return 0;
+}
 
 static int handle_req(server_db *sdb, SOCKET client, struct tfs_req r)
 {
@@ -197,6 +214,9 @@ static int handle_req(server_db *sdb, SOCKET client, struct tfs_req r)
 
     case REQ_PUT_FILE:
         return handle_req_put_file(sdb, client, r);
+
+    case REQ_PUT_FS:
+        return handle_req_put_fs(sdb, client, r);
 
     case REQ_NEW_FS:
         break;

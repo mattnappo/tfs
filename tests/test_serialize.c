@@ -221,13 +221,13 @@ void test_fsid()
 
 int main()
 {
-    test_file();
-    test_vdisk();
-    test_ftfile();
-    test_ftbucket();
-    test_ftable();
-    test_fs();
-    test_io();
+    //test_file();
+    //test_vdisk();
+    //test_ftfile();
+    //test_ftbucket();
+    //test_ftable();
+    //test_fs();
+    //test_io();
     test_fsid();
 
     return 0;

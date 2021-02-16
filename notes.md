@@ -37,3 +37,7 @@ The client can request to:
 2. Multiple filesystems
 3. Authorization
 4. CLI
+
+# Bugs?
+ - Check whether I need to un-comment the destroy_fs in server handle_req methods
+ - Also check if those need to be static or not

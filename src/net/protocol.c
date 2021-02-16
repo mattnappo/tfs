@@ -5,7 +5,9 @@ const char *emesgs[] = {
     "server error: server unable to process request",
     "server error: request body too large",
     "server error: file with name not exist",
-    "server error: internal fs error"
+    "server error: internal fs error",
+    "server error: invalid fs to deserialize",
+    "server error: fsdb error on put/get"
 };
 
 void print_req(struct tfs_req r, int show_body)

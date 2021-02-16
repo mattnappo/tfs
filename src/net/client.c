@@ -176,3 +176,30 @@ int client_put_file(
     printf("successfully put file\n");
     return 0;
 }
+
+int client_put_fs(SOCKET server, struct fs *fs)
+{
+    // Serialize fs
+    uint8_t *sbuf;
+    size_t slen = serialize_fs(&sbuf, fs);
+    if (slen >= MAX_REQ_BODY_LEN) {
+        printf("fs too large to send to server.\n");
+        free(sbuf);
+        return 1;
+    }
+
+    // Make req
+    struct tfs_req req = { .type = REQ_PUT_FS, .body_len = slen };
+    memset(req.fsid, 0x00, FSID_LEN);
+    memcpy(req.body, sbuf, slen);
+    free(sbuf);
+
+    // Exchange w/server
+    struct tfs_res res = client_exchange(server, req, RES_SUCCESS);
+    if (res.type == RES_NULL) {
+        printf("unable to exchange with server.\n");
+        return 1;
+    }
+    printf("successfully put fs.\n");
+    return 0;
+}

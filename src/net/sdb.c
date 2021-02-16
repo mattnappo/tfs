@@ -93,7 +93,7 @@ server_db *init_sdb()
     // For now, just load one
     // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
     // naming somehow.
-    struct fs *fs = read_fs("files/test_fs.fs");
+    struct fs *fs = read_fs("/home/matt/git/tfs/files/test_fs.fs");
     if (fs == NULL) {
         printf("unable to load fs from disk.\n");
         return NULL;

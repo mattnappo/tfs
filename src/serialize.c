@@ -328,9 +328,9 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
     }
 
     // Print fsid
-    //uint8_t fsid[FSID_LEN];
-    //memcpy(fsid, fs->fsid.data, FSID_LEN);
-    //print_fsid(fsid);
+    uint8_t fsid[FSID_LEN];
+    memcpy(fsid, fs->fsid.data, FSID_LEN);
+    print_fsid(fsid);
 
     filesystem__free_unpacked(fs, NULL);
     return dfs;

@@ -50,16 +50,19 @@ enum net_err {
     ERR_REQUEST_FAIL,
     ERR_BODY_OVERFLOW,
     ERR_FILE_NOT_EXIST,
-    ERR_FS_FAIL
+    ERR_FS_FAIL,
+    ERR_INVALID_FS,
+    ERR_FSDB_ERR
 };
 int send_err(SOCKET client, enum net_err err);
  
 enum req_type {
-    REQ_GET_FS,          /* get fs by fsid,   body=null */
-    REQ_GET_FILE,        /* get file,         body=filename */
-    REQ_PUT_FILE,        /* put file into fs, body=file bytes */
-    REQ_NEW_FS,          /* make a new fs,    body=null */
-    REQ_GET_ALL_FSIDS,   /* get all fsids in fsdb, body=null*/
+    REQ_GET_FS,        /* get fs by fsid,   body=null */
+    REQ_GET_FILE,      /* get file,         body=filename */
+    REQ_PUT_FILE,      /* put file into fs, body=file bytes */
+    REQ_NEW_FS,        /* make a new fs,    body=null */
+    REQ_PUT_FS,        /* put an fs,        body=fs */
+    REQ_GET_ALL_FSIDS, /* get all fsids in fsdb, body=null*/
     REQ_MAX = 255
 };
 
@@ -103,5 +106,6 @@ SOCKET init_client(char *ip, char *port);
 struct fs*  client_get_fs  (SOCKET server, uint8_t tfsid[]);
 struct file client_get_file(SOCKET server, uint8_t tfsid[], char *filename);
 int         client_put_file(SOCKET server, uint8_t tfsid[], struct file f, uint16_t offset);
+int         client_put_fs  (SOCKET server, struct fs *fs);
 
 #endif
