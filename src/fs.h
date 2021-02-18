@@ -22,6 +22,7 @@ struct file {
 struct fs {
     struct vdisk *disk;
     struct ftable *ft;
+    uint8_t fsid[FSID_LEN]; // Calculated once, at inception
 };
 
 struct temp_fsid {
@@ -38,7 +39,7 @@ void        fs_print_file  (struct fs *fs, char *name, int show_mem);
 void        destroy_fs     (struct fs *fs);
 
 /* fsid methods */
-struct temp_fsid calc_fsid(struct fs *fs);
+struct temp_fsid calc_fsid(struct fs fs);
 void print_fsid(uint8_t fsid[FSID_LEN]);
 char *stringify_fsid(uint8_t fsid[FSID_LEN]);
 int fsid_equal(uint8_t base[FSID_LEN], uint8_t other[FSID_LEN]);

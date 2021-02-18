@@ -264,10 +264,15 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
     sft.n_files = fs->ft->n_files;
 
     // Calculate and copy over the fsid
-    struct temp_fsid temp_fsid = calc_fsid(fs);
+    /*
+    struct temp_fsid temp_fsid = calc_fsid(*fs);
     sfs.fsid.data = malloc(FSID_LEN);
     sfs.fsid.len = FSID_LEN;
     memcpy(sfs.fsid.data, temp_fsid.fsid, FSID_LEN);
+    */
+    sfs.fsid.data = malloc(FSID_LEN);
+    sfs.fsid.len = FSID_LEN;
+    memcpy(sfs.fsid.data, fs->fsid, FSID_LEN);
 
     // Set into final fs to be serialized
     sfs.ft = &sft;

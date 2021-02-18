@@ -1,6 +1,6 @@
 #include "net/net.h"
 
-uint8_t tfsid[FSID_LEN] = {0x49,0x06,0x1a,0x0c,0x37,0x61,0x73,0xfa,0xfd,0x88,0xcd,0xac,0x5b,0x09,0x3b,0x21};
+uint8_t tfsid[FSID_LEN] = {0x5b,0x85,0xc8,0x64,0xe3,0x2b,0x88,0x82,0x62,0xb2,0xf8,0x85,0x4d,0xc5,0xe1,0x66 };
 
 static struct fs *get_temp_fs()
 {
@@ -29,7 +29,7 @@ int test_client_get_fs(char *argv[])
     struct file f = fs_get_file(fs, "files/testfile.txt");
     print_file(f, ASCII);
 
-    //destroy_fs(fs);
+    destroy_fs(fs);
     destroy_file(f);
     return 0;
 }
@@ -91,7 +91,7 @@ int test_client_put_fs(char *argv[])
         destroy_fs(tfs);
         return status;
     }
-    //destroy_fs(tfs);
+    destroy_fs(tfs);
     return 0;
 }
 
@@ -102,20 +102,20 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("\nGETTING FS\n");
-    test_client_get_fs(argv);
+    //printf("\nGETTING FS\n");
+    //test_client_get_fs(argv);
 
-    printf("\nGETTING FILE\n");
-    test_client_get_file(argv);
+    //printf("\nGETTING FILE\n");
+    //test_client_get_file(argv);
 
-    printf("\nPUTTING FILE\n");
-    test_client_put_file(argv);
+    //printf("\nPUTTING FILE\n");
+    //test_client_put_file(argv);
 
-    printf("\nGETTING (NEW) FS\n");
-    test_client_get_fs(argv);
+    //printf("\nGETTING (NEW) FS\n");
+    //test_client_get_fs(argv);
 
-    //printf("\nPUTTING SAME FS (SHOULD ERROR)\n");
-    //test_client_put_fs(argv);
+    printf("\nPUTTING FS\n");
+    test_client_put_fs(argv);
 
     return 0;
 }

@@ -43,7 +43,7 @@ int start_server(char *port)
     // Process only n requests (for testing purposes)
     int maxnreqs = 3;
     int nreqs = 0;
-    while (1) {
+    while (nreqs < 1) {
         status = listen(sd, backlog);
         if (status < 0) {
             fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
@@ -193,13 +193,13 @@ static int handle_req_put_fs(server_db *sdb, SOCKET client, struct tfs_req r)
         destroy_fs(dfs);
         return 1;
     }
-    if (sdb_put_fs(sdb, dfs) != 0) {
+    if (sdb_put_fs(sdb, *dfs) != 0) {
         send_err(client, ERR_FSDB_ERR);
         destroy_fs(dfs);
         return 1;
     }
     send_success(client);
-    //destroy_fs(dfs);
+    destroy_fs(dfs);
     return 0;
 }
 

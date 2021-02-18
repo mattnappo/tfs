@@ -189,7 +189,7 @@ int client_put_fs(SOCKET server, struct fs *fs)
 
     // Make req
     struct tfs_req req = { .type = REQ_PUT_FS, .body_len = slen };
-    memset(req.fsid, 0x00, FSID_LEN);
+    memcpy(req.fsid, fs->fsid, FSID_LEN);
     memcpy(req.body, sbuf, slen);
     free(sbuf);
 

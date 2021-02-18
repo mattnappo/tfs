@@ -76,10 +76,12 @@ struct fs *new_fs()
     struct fs *fs = malloc(sizeof(struct fs));
     fs->disk = new_vdisk();
     fs->ft = new_ftable();
+    struct temp_fsid fsid = calc_fsid(*fs);
+    memcpy(fs->fsid, fsid.fsid, FSID_LEN);
     return fs;
 }
 
-struct temp_fsid calc_fsid(struct fs *fs)
+struct temp_fsid calc_fsid(struct fs fs)
 {
     uint8_t fsid[FSID_LEN];
     memset(fsid, 0, FSID_LEN);
