@@ -215,8 +215,23 @@ void test_io()
 
 void test_fsid()
 {
-    struct fs *fs = read_fs("files/test_fs.fs");
+    struct fs *fs = read_fs("files/test_sdb.fs");
     destroy_fs(fs);
+}
+
+void gen_sdb_fs()
+{
+    struct fs *tfs = new_fs();
+    struct file tfile1 = new_file("files/testfile.txt");
+    struct file tfile2 = new_file("files/testfile2.txt");
+
+    fs_add_file(tfs, tfile1, 0);
+    fs_add_file(tfs, tfile2, 100);
+
+    destroy_file(tfile1);
+    destroy_file(tfile2);
+    write_fs("files/test_sdb.fs", tfs);
+    destroy_fs(tfs);
 }
 
 int main()
@@ -229,6 +244,7 @@ int main()
     //test_fs();
     //test_io();
     test_fsid();
+    gen_sdb_fs();
 
     return 0;
 }

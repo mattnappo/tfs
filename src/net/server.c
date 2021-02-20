@@ -37,6 +37,7 @@ int start_server(char *port)
         printf("unable to initialize server state.\n");
         return 1;
     }
+    sdb_list_fsids(sdb);
 
     // Listen
     int backlog = MAX_CONNECTIONS;
@@ -101,6 +102,8 @@ static int handle_req_get_fs(server_db *sdb, SOCKET client, struct tfs_req r)
     struct fs fs = sdb_get_fs(sdb, r.fsid);
     if (fs.ft == NULL)
         return 1;
+    printf("important listing of files:\n");
+    fs_list_files(fs);
     uint8_t *fs_buf;
     unsigned fs_len = serialize_fs(&fs_buf, &fs);
     if (fs_len >= MAX_RES_BODY_LEN) {
@@ -130,7 +133,7 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
     struct fs fs = sdb_get_fs(sdb, r.fsid);
     if (r.body_len >= FILENAME_SIZE) {
         send_err(client, ERR_BODY_OVERFLOW);
-        destroy_fs(&fs);
+        //destroy_fs(&fs);
         return 1;
     }
 
@@ -140,7 +143,7 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
     struct file f = fs_get_file(&fs, (char *) filename);
     if (f.s <= 0) {
         send_err(client, ERR_FILE_NOT_EXIST);
-        destroy_fs(&fs);
+        //destroy_fs(&fs);
         return 1;
     }
 
@@ -157,7 +160,7 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
     free(packed);
 
     destroy_file(f);
-    destroy_fs(&fs);
+    //destroy_fs(&fs);
     return 0;
 }
 

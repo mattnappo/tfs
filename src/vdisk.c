@@ -40,8 +40,9 @@ int vdisk_write(
         printf("buffer is too big.\n");
         return 1;
     }
-    for (size_t i = 0; i < s; i++)
-        disk->bytes[i + offset] = b[i];
+    memcpy(disk->bytes+offset, b, s);
+    //for (size_t i = 0; i < s; i++)
+    //    disk->bytes[i + offset] = b[i];
     return 0;
 }
 

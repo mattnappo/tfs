@@ -1,64 +1,39 @@
 #include "net/sdb.h"
 
-static struct fs get_temp_fs()
-{
-    struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("files/testfile.txt");
-    fs_add_file(tfs, tfile1, 0);
-    destroy_file(tfile1);
-    struct fs fs = *tfs;
-    destroy_fs(tfs);
-    return fs;
-}
-
-int test_put()
+int test_get_put()
 {
     server_db *sdb = init_sdb();
-    struct fs fs = get_temp_fs();
-    sdb_put_fs(sdb, fs);
-    sdb_list_fsids(sdb);
+    sdb_list_fsids(sdb); // Should be null
 
-    destroy_sdb(sdb);
-
-    return 0;
-}
-
-int test_get()
-{
-    server_db *sdb = init_sdb();
-    sdb_list_fsids(sdb);
-
-    // Get temp fs
-    struct fs *tfs = new_fs();
-    struct file tfile1 = new_file("files/testfile.txt");
-    fs_add_file(tfs, tfile1, 0);
-    destroy_file(tfile1);
-    struct fs fs = *tfs;
-    destroy_fs(tfs);
+    // Generate a temp fs
+    struct fs *tmp_fsp = new_fs();
+    struct file tmp_f = new_file("files/testfile.txt");
+    fs_add_file(tmp_fsp, tmp_f, 0);
+    destroy_file(tmp_f);
 
     // Put temp fs
-    sdb_put_fs(sdb, fs);
+    sdb_put_fs(sdb, *tmp_fsp);
     sdb_list_fsids(sdb);
 
-    // // Fetch it again
-    struct fs fetched = sdb_get_fs(sdb, fs.fsid); // BUG is here
-    char *sfsid = stringify_fsid(fs.fsid);
+    // Fetch it again
+    struct fs fetched = sdb_get_fs(sdb, tmp_fsp->fsid);
+    char *sfsid = stringify_fsid(fetched.fsid);
     printf("[fetched fsid]  %s\n", sfsid);
     printf("[fetched vdisk]\n");
-    vdisk_dump(fetched.disk, HEX, DISK_SIZE);
+    vdisk_dump(fetched.disk, HEX, 500);
     free(sfsid);
     
-    // fs_list_files(fs); 
+    fs_list_files(fetched); 
 
     destroy_sdb(sdb);
+    destroy_fs(tmp_fsp);
     return 0;
 }
 
 int main()
 {
     int status = 0;
-    //status = test_put();
-    status = test_get();
+    status = test_get_put();
 
     return status;
 }

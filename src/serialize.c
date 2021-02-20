@@ -263,13 +263,7 @@ unsigned serialize_fs(uint8_t **buf, struct fs *fs)
     sft.buckets = buckets;
     sft.n_files = fs->ft->n_files;
 
-    // Calculate and copy over the fsid
-    /*
-    struct temp_fsid temp_fsid = calc_fsid(*fs);
-    sfs.fsid.data = malloc(FSID_LEN);
-    sfs.fsid.len = FSID_LEN;
-    memcpy(sfs.fsid.data, temp_fsid.fsid, FSID_LEN);
-    */
+    // Copy over the fsid (do not calculate it)
     sfs.fsid.data = malloc(FSID_LEN);
     sfs.fsid.len = FSID_LEN;
     memcpy(sfs.fsid.data, fs->fsid, FSID_LEN);
@@ -331,11 +325,7 @@ struct fs *deserialize_fs(uint8_t *buf, unsigned len)
             dfs->ft->n_files++;
         }
     }
-
-    // Print fsid
-    uint8_t fsid[FSID_LEN];
-    memcpy(fsid, fs->fsid.data, FSID_LEN);
-    print_fsid(fsid);
+    memcpy(dfs->fsid, fs->fsid.data, FSID_LEN); // Copy fsid
 
     filesystem__free_unpacked(fs, NULL);
     return dfs;

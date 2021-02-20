@@ -93,12 +93,13 @@ int sdb_load_fs_disk(server_db *sdb, const char *filename)
         printf("unable to load fs from disk.\n");
         return 1;
     }
+    printf("listing files while loading from disk:\n");
     fs_list_files(*fs);
     if (sdb_put_fs(sdb, *fs) != 0) {
         printf("unable to insert fs into fsdb.\n");
         return 1;
     }
-    destroy_fs(fs);
+    //destroy_fs(fs);
     return 0;
 }
 
@@ -112,7 +113,7 @@ server_db *init_sdb()
     // For now, just load one
     // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
     // naming somehow.
-    // sdb_load_fs_disk("files/test_fs.fs");
+    sdb_load_fs_disk(sdb, "files/test_sdb.fs");
 
     return sdb;
 }
