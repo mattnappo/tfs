@@ -38,6 +38,7 @@ struct ftable {
 };
 
 struct ftable *new_ftable();
+struct ftable *copy_ftable(struct ftable *ft);
 struct ftable_file *new_ftable_file(char name[], size_t s, size_t offset);
 struct ftable_bucket *new_ftable_bucket();
 

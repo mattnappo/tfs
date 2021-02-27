@@ -31,4 +31,6 @@ struct fs            *deserialize_fs            (uint8_t *buf, unsigned len);
 int        write_fs (const char *filename, struct fs *fs);
 struct fs *read_fs  (const char *filename);
 
+struct fs *cheap_copy_fs(struct fs fs);
+
 #endif

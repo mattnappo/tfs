@@ -9,7 +9,6 @@ int test_get_put()
     struct fs *tmp_fsp = new_fs();
     struct file tmp_f = new_file("files/testfile.txt");
     fs_add_file(tmp_fsp, tmp_f, 0);
-    destroy_file(tmp_f);
 
     // Put temp fs
     sdb_put_fs(sdb, *tmp_fsp);
@@ -25,8 +24,11 @@ int test_get_put()
     
     fs_list_files(fetched); 
 
+    // destroy_file(fetched); // need?
+
     destroy_sdb(sdb);
     destroy_fs(tmp_fsp);
+    destroy_file(tmp_f);
     return 0;
 }
 

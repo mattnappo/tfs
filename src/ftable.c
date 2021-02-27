@@ -40,6 +40,13 @@ struct ftable *new_ftable()
     return ft;
 }
 
+/*
+struct ftable *copy_ftable(struct ftable *ft)
+{
+    return NULL;
+}
+*/
+
 static struct ftable_bucket *get_bucket_from_key(
     struct ftable *ft, char key[]
 ) {

@@ -55,10 +55,10 @@ static int fs_in_fsdb(fsdb *fdb, uint8_t fsid[FSID_LEN])
     return 0;
 }
 
-static struct fsdb_fs *new_fsdb_fs(struct fs fs, uint8_t fsid[FSID_LEN])
+static struct fsdb_fs *new_fsdb_fs(struct fs fs)
 {
     struct fsdb_fs *entry = malloc(sizeof(struct fsdb_fs));
-    memcpy(entry->fsid, fsid, FSID_LEN);
+    memcpy(entry->fsid, fs.fsid, FSID_LEN);
     entry->next = NULL;
     entry->prev = NULL;
     entry->fs = fs;
@@ -99,7 +99,7 @@ int sdb_load_fs_disk(server_db *sdb, const char *filename)
         printf("unable to insert fs into fsdb.\n");
         return 1;
     }
-    //destroy_fs(fs);
+    //destroy_fs(fs); -- very hard line to fix --
     return 0;
 }
 
@@ -113,7 +113,7 @@ server_db *init_sdb()
     // For now, just load one
     // Also eventually make a flag to init, or load. Have multiple fsdbs on disk
     // naming somehow.
-    sdb_load_fs_disk(sdb, "files/test_sdb.fs");
+    // sdb_load_fs_disk(sdb, "files/test_sdb.fs");
 
     return sdb;
 }
@@ -138,24 +138,25 @@ struct fs sdb_get_fs(server_db *sdb, uint8_t fsid[FSID_LEN])
 
 int sdb_put_fs(server_db *sdb, struct fs fs)
 {
+    char *sfsid = stringify_fsid(fs.fsid);
     if (fs_in_fsdb(sdb->fdb, fs.fsid) == 1) {
-        char *sfsid = stringify_fsid(fs.fsid);
         printf("fs %s already in the fsdb.\n", sfsid);
         free(sfsid);
         return 1;
     }
 
-    char *tfsid = stringify_fsid(fs.fsid);
-    printf("attempting to put fs %s in the fsdb.\n", tfsid);
-    free(tfsid);
+    //struct fs *fs_tmp = cheap_copy_fs(fs);
+    //struct fs fsc = *fs_tmp;
 
-    struct fsdb_fs *entry = new_fsdb_fs(fs, fs.fsid);
+    printf("attempting to put fs %s in the fsdb.\n", sfsid);
+
+    struct fsdb_fs *entry = new_fsdb_fs(fs);
     struct fsdb_bucket *bucket = fsdb_get_bucket(sdb->fdb, fs.fsid);
     fsdb_add_entry(bucket, entry);
     sdb->fdb->n_fs++;
-    char *sfsid = stringify_fsid(fs.fsid);
     printf("put fsid %s in fsdb.\n", sfsid);
     free(sfsid);
+    //destroy_fs(fs_tmp);
     return 0;
 }
 

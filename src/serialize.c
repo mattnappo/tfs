@@ -357,3 +357,12 @@ struct fs *read_fs(const char *filename)
     fclose(fd);
     return dfs;
 }
+
+struct fs *cheap_copy_fs(struct fs fs)
+{
+    uint8_t *buffer;
+    size_t len = serialize_fs(&buffer, &fs);
+    struct fs *copy = deserialize_fs(buffer, len);
+    free(buffer);
+    return copy;
+}

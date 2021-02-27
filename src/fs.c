@@ -81,6 +81,29 @@ struct fs *new_fs()
     return fs;
 }
 
+/*
+// Perform a deep copy of an fs (static for now)
+static struct fs _copy_fs(struct fs *fs)
+{
+    struct fs copy = {};
+
+    // Copy disk
+    struct vdisk *disk = malloc(sizeof(struct vdisk));
+    memcpy(disk->bytes, fs->disk->bytes, fs->disk->s);
+    disk->s = fs->disk->s;
+    copy.disk = disk;
+
+    // Copy ft
+    struct ftable *ft = copy_ftable(fs->ft);
+    copy.ft = ft;
+
+    // Copy fsid
+    memcpy(copy.fsid, fs->fsid, FSID_LEN);
+
+    return copy;
+}
+*/
+
 struct temp_fsid calc_fsid(struct fs fs)
 {
     uint8_t fsid[FSID_LEN];
