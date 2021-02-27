@@ -98,11 +98,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //printf("\nPUTTING FS\n");
-    //test_client_put_fs(argv);
+    printf("\nPUTTING FS\n");
+    test_client_put_fs(argv);
 
-    printf("\nGETTING FS\n");
-    test_client_get_fs(argv);
+    //printf("\nGETTING FS\n");
+    //test_client_get_fs(argv);
 
     //printf("\nGETTING FILE\n");
     //test_client_get_file(argv);
