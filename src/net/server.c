@@ -41,10 +41,8 @@ int start_server(char *port)
 
     // Listen
     int backlog = MAX_CONNECTIONS;
-    // Process only n requests (for testing purposes)
-    int maxnreqs = 3;
     int nreqs = 0;
-    while (nreqs < 1) {
+    while (nreqs < 2) {
         status = listen(sd, backlog);
         if (status < 0) {
             fprintf(stderr, "listen failed: %d\n", GETSOCKETERRNO());
@@ -164,6 +162,7 @@ static int handle_req_get_file(server_db *sdb, SOCKET client, struct tfs_req r)
     return 0;
 }
 
+// TODO next: updating
 static int handle_req_put_file(server_db *sdb, SOCKET client, struct tfs_req r)
 {
     // Fetch the fs
@@ -202,7 +201,6 @@ static int handle_req_put_fs(server_db *sdb, SOCKET client, struct tfs_req r)
         return 1;
     }
     send_success(client);
-    destroy_fs(dfs);
     return 0;
 }
 

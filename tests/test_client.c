@@ -1,6 +1,6 @@
 #include "net/net.h"
 
-uint8_t tfsid[FSID_LEN] = {0xbc,0x21,0xab,0x12,0x4b,0xa6,0xc0,0xeb,0xd0,0x3a,0xad,0xb7,0x19,0x90,0xba,0x2a};
+uint8_t tfsid[FSID_LEN] = {0xa5,0xcf,0xe7,0x7a,0xb6,0xff,0x0e,0x76,0xea,0xb3,0xb6,0xcb,0x6b,0x74,0x97,0xd0};
 
 static struct fs *get_temp_fs()
 {
@@ -87,7 +87,7 @@ int test_client_put_fs(char *argv[])
         destroy_fs(tfs);
         return status;
     }
-    destroy_fs(tfs);
+    //destroy_fs(tfs);
     return 0;
 }
 
@@ -97,6 +97,9 @@ int main(int argc, char *argv[])
         printf("usage: client <ip> <port>\n");
         return 1;
     }
+
+    //printf("\nPUTTING FS\n");
+    //test_client_put_fs(argv);
 
     printf("\nGETTING FS\n");
     test_client_get_fs(argv);
@@ -109,9 +112,6 @@ int main(int argc, char *argv[])
 
     //printf("\nGETTING (NEW) FS\n");
     //test_client_get_fs(argv);
-
-    //printf("\nPUTTING FS\n");
-    //test_client_put_fs(argv);
 
     return 0;
 }

@@ -24,8 +24,6 @@ int test_get_put()
     
     fs_list_files(fetched); 
 
-    // destroy_file(fetched); // need?
-
     destroy_sdb(sdb);
     destroy_fs(tmp_fsp);
     destroy_file(tmp_f);
